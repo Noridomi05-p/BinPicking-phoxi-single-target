@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-15",
+  "result": "PASS",
+  "test_count": 78,
+  "skipped": 0,
+  "command": "python -m unittest discover -s tests -v",
+  "duration_seconds": 1.722,
+  "environment": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "opencv_headless": "4.14.0"
+  },
+  "coverage": "synthetic numeric, mocked camera/GUI, portable saved-mask CLI replay",
+  "not_run": [
+    "physical PhoXi capture",
+    "YOLO best.pt inference",
+    "GraspNet checkpoint inference",
+    "Robotiq or robot motion",
+    "real-scene grasp success or timing benchmark"
+  ]
+}

@@ -1,0 +1,2476 @@
+--- /dev/null
++++ b/CAP_NHAT_SINGLE_TARGET.md
+@@ -0,0 +1,179 @@
++# Cập nhật 0.2 — chọn một mục tiêu và đề xuất tư thế gắp trong hệ camera
++
++Ngày đóng gói: 15/10/2026. Bản này ghép mã từ `phoxi_source_roi_3d.zip`,
++`phoxi_roi_3d_update.zip`, `phoxi_graspnet_update.zip` đã được đối chiếu.
++Không có trọng số YOLO, checkpoint GraspNet, scan camera thật hoặc hiệu chuẩn robot
++trong các gói nguồn dùng để phát triển. Mã trên máy vận hành có thể có chỉnh sửa mới hơn.
++
++## Chạy thử
++
++Giải nén vào một thư mục mới. Dùng môi trường Python của dự án và chạy từ thư mục
++có `pyproject.toml`:
++
++```bash
++python -m pip install -e .
++python -m unittest discover -s tests -v
++python scripts/15_replay_picking.py examples/synthetic_inspection
++```
++
++Demo dùng dữ liệu **tổng hợp**, không cần camera, YOLO hay GPU. Kết quả nằm ở
++`examples/synthetic_inspection/picking_replay/`: ảnh `target.png` và `picking.json`.
++Trạng thái dự kiến là `PREVIEW_UNVALIDATED`, vì kích thước cơ khí để kiểm tra
++tay kẹp chưa được cung cấp. Có hai vật trong dữ liệu; màn hình chính chỉ chú thích
++vật được chọn. Thêm `--debug` để xem tất cả.
++
++Để chạy thật, đối chiếu các giá trị camera, crop, đường dẫn `best.pt`, `imgsz`,
++confidence và các thông số đang dùng với `config/project.yaml` của bản mới.
++Giữ nguyên thứ tự năm lớp trong `classes.txt`. Không thay cấu hình máy đang chạy
++bằng giá trị ví dụ khi chưa đối chiếu. Có thể trỏ `yolo.weights` đến file hiện có
++bằng đường dẫn tuyệt đối, không cần chép lại trọng số.
++
++```bash
++python scripts/07_run_live.py --config config/picking.yaml
++```
++
++1. Để thùng trống. Bấm **R** để chọn ROI làm việc trong thùng.
++2. Bấm **F** để chọn riêng vùng đáy phẳng nhìn thấy, tránh thành thùng. Đây là vùng
++   để khớp mặt phẳng, không phải ROI phát hiện vật.
++3. Bấm **B** để chụp 15 frame nền. Kiểm tra thông báo `FLOOR PLANE: READY`.
++   Nếu khớp mặt phẳng thất bại, xem lý do; không tự chuyển sang đo theo Z trong chế độ này.
++4. Đặt vật vào, bấm **Space/N** để chụp mới. **D** bật/tắt toàn bộ vật và thông tin
++   loại bỏ. **S** lưu trọn gói bằng chứng. Sau thay đổi ROI/nền, cần chụp frame mới.
++5. Chế độ chụp tự động/TCP vẫn dùng các phím 1–4; chưa có lệnh điều khiển robot.
++
++`config/inspection.yaml` tiếp tục dùng luồng kiểm tra cũ, hiển thị tất cả vật.
++Luồng chọn một vật chỉ bật với `picking.enabled: true`.
++
++## Các thay đổi đã triển khai
++
++| Phần | Hành vi mới |
++|---|---|
++| Cấu hình | Đưa các ngưỡng nền vào project.yaml; dùng `min_raised_ratio_mask: 0.02`, `min_raised_points: 30`. Khóa cũ/misspell và giá trị không hợp lệ ở các nhóm mới được báo lỗi. |
++| Kiểm tra depth bằng chuột | Ánh xạ cả hai nửa Texture/Depth về đúng pixel và chặn tọa độ ngoài ảnh. |
++| Auto-label | Kiểm tra số lớp, ID liên tục và đúng thứ tự trước khi truy cập tên lớp. |
++| ROI | Điểm lõi nằm trong mask thay cho trung bình tọa độ khi kiểm tra tâm thuộc ROI. |
++| Chiều cao | Khoảng cách có dấu vuông góc với mặt phẳng đáy; vẫn kiểm tra thay đổi so với nền trống để tránh coi thành thùng là vật mới. |
++| Nền tham chiếu | Lưu camera, crop, hệ tọa độ, nguồn sáng và mã hiệu chuẩn; sai identity/cùng kích thước vẫn báo UNKNOWN. |
++| Tầng sàng lọc | Thống kê 3D thô, ROI/nền, tỷ lệ dữ liệu hợp lệ; xếp theo tỷ lệ hợp lệ, H90 và confidence. Điểm xếp hạng không phải xác suất gắp thành công. |
++| Tầng chi tiết | Xử lý từng ứng viên theo thứ tự, tối đa 3; chỉ đo đầy đủ cho mục tiêu cuối. Vật đầu thất bại thì thử hướng khác hoặc vật sau. |
++| Làm sạch | Tách liên thông 3D bằng khoảng cách giữa điểm lân cận; giữ bề mặt chiếm ưu thế. Không cắt tùy ý phần gần camera nhất. |
++| Điểm mốc gắp | Distance transform tìm lõi, sau đó chọn đúng một điểm 3D đã đo gần trung vị cục bộ. |
++| Pháp tuyến | Đồng nhất dấu NormalMap hướng về camera, đối chiếu mặt phẳng cục bộ RANSAC/SVD; dùng SVD nếu NormalMap không đáng tin. |
++| Hướng kẹp | OBB trên mặt tiếp tuyến; thử cạnh ngắn/cạnh dài và các hướng bổ sung với vật đối xứng. Vượt góc nghiêng thì loại, không ép góc. |
++| Khẩu độ | Kiểm tra bề rộng đối xứng quanh điểm mốc, biên sai số và khe hở hai bên trước khi so với hành trình mở. |
++| Khoảng trống | Thể tích ngón và lòng kẹp quét theo đường tiếp cận thẳng; giữ toàn bộ điểm cảnh, kể cả điểm bị loại khỏi phép đo vật. |
++| Dữ liệu không quan sát | Lỗ depth, vùng bị che, thể tích ra ngoài ảnh hoặc phép chiếu không đạt sai số đều cho UNKNOWN. |
++| Tuổi dữ liệu | Xuất thời điểm bắt đầu chụp, tuổi frame và hạn dùng; không chọn mục tiêu live từ frame quá hạn. Hình đang giữ cũng đổi trạng thái khi hết hạn. |
++| Texture | CLAHE tùy chọn, mặc định tắt; cùng công thức cho thu ảnh và suy luận, không áp hai lần khi chạy lại. |
++| Replay | Dùng chính mask đã lưu, không suy luận YOLO lại; tham chiếu tương đối, kiểm tra hash để phát hiện bộ dữ liệu bị trộn/sửa. |
++
++Không tự gộp hai mask sát nhau và đồng phẳng. Chưa biết kích thước đầy đủ của vật
++bị che nên không tuyên bố vật nguyên vẹn hoặc bề rộng thực đã được xác nhận.
++`class_shapes` chỉ hỗ trợ chọn kiểu hình học và các góc cần thử. Với chai/trụ,
++chế độ tiếp xúc nắp/thân và phân biệt đứng/nằm chưa được xác nhận bằng dữ liệu thật;
++đầu ra ghi `cylinder_contact_mode: UNVERIFIED`.
++
++## Đọc kết quả
++
++- `measurement.center_xyz_mm`: trung vị từng trục để thống kê bề mặt thấy được.
++- `picking.pose.surface_anchor_xyz_mm`: một điểm đo thật; pixel tương ứng là
++  `surface_anchor_uv`. Đây chưa phải vị trí TCP hay tâm đóng ngón ở độ sâu kẹp.
++- `rotation_camera`: ma trận 3×3, các **cột** lần lượt là x tiếp tuyến, y đóng/mở
++  ngón, z tiếp cận vào vật. Ma trận ánh xạ vector từ hệ gắp hình học sang hệ camera.
++  Đơn vị vị trí là mm. Không xuất Euler chưa xác định quy ước robot.
++- `proposed_opening_mm` gồm bề rộng nhìn thấy tính đối xứng quanh điểm mốc,
++  `width_uncertainty_mm` và hai lần `opening_gap_mm`.
++- `robot_ready` luôn là **false**, kể cả khi phép kiểm tra tiếp cận đạt.
++- `pipeline_timings_ms` tách chuẩn hóa, YOLO, các bộ lọc/thống kê, và phần chọn mục
++  tiêu/đo chi tiết. `picking.timings_ms.rank` chỉ là bước xếp hạng, không phải toàn
++  bộ tầng 1. Không có cam kết 1–2 ms; cần đo trên máy GTX 1650 và scan thật.
++
++| Trạng thái | Ý nghĩa |
++|---|---|
++| `NO_TARGET` | Không đủ điều kiện hoặc mọi tư thế bị loại; xem reasons/ranking/attempts. |
++| `PREVIEW_UNVALIDATED` | Có đề xuất hình học, nhưng khoảng trống chưa được xác minh. |
++| `APPROACH_CHECKED_PROPOSAL` | Thể tích tiếp cận đã kiểm tra trong phần cảnh quan sát được với mô hình đã cấu hình. |
++| `STALE_PROPOSAL` / `STALE_DISPLAY` | Frame hết hạn; không cung cấp mục tiêu live để dùng tiếp. |
++| `RECAPTURE_REQUIRED` | Đã đổi ROI/nền trên frame cũ; cần chụp mới. |
++
++Tuổi frame không chứng minh cảnh chưa chuyển động. Việc khóa chu kỳ robot,
++đồng bộ vùng làm việc và xác nhận cảnh còn hiệu lực phải được nối ở bước tích hợp robot.
++
++## Mô hình kiểm tra khoảng trống cần dữ liệu cơ khí
++
++Trong `picking.clearance`, các kích thước chưa biết để `null` và
++`geometry_verified: false`. Khi thiếu thông số, đầu ra là
++`GRIPPER_GEOMETRY_UNCONFIGURED`; hệ thống vẫn cho xem đề xuất hình học.
++
++Các hộp bao phải bao trùm cơ cấu thật tại khẩu độ đề xuất, gồm ngón, khớp/linkage
++và lòng kẹp. Không điền số ước lượng để bật `geometry_verified`. Trong hệ gắp hình học:
++
++- `finger_span_mm`: bề rộng ngón theo x; `finger_thickness_mm`: bề dày theo y.
++- `finger_length_mm`: chiều dài ngón theo z; `insertion_depth_mm`: mức đầu ngón
++  đi vào dưới mốc bề mặt theo +z, phải nhỏ hơn chiều dài ngón.
++- `palm_span_mm`, `palm_width_mm`, `palm_depth_mm`: kích thước lòng kẹp theo x/y/z.
++- `vertical_motion_envelope_mm`: phần bao thêm để tính đến độ dịch dọc z của cơ cấu.
++- `approach_mm`: chiều dài tiếp cận thẳng từ phía -z; `safety_margin_mm`: nới hộp bao.
++
++Phép kiểm tra dùng mọi điểm đo để tìm vật cản và kiểm tra tia nhìn xuyên qua hộp
++bao tới nền quan sát được. Phép chiếu ảnh được ước lượng từ XYZ đã tổ chức và kiểm
++tra sai số trên mọi điểm hợp lệ; nếu không đạt thì UNKNOWN. Phép chiếu này phục vụ
++kiểm tra/hiển thị, không thay thế hiệu chuẩn camera hay hand-eye.
++
++Chưa có xác nhận quỹ đạo đóng ngón với tiếp xúc, rút vật đang cầm, cổ tay/toàn bộ
++tay máy và giới hạn khớp. Các trường `closing_status`, `retreat_status`, `arm_status`
++ghi rõ phần chưa kiểm chứng. Điều kiện này không được nâng thành “an toàn tuyệt đối”.
++
++## Tương thích GraspNet và dữ liệu cũ
++
++`13_run_grasp_offline.py`, checkpoint/API và kết quả GraspNet giữ luồng riêng.
++Backend mới trong live là `deterministic_surface_geometry`; không tự tải/chạy
++GraspNet trên GPU. Hàm `geometry.to_graspnet_rotation()` chuyển **hướng** từ quy ước
++mới sang GraspNet (+x approach, +y closing). Vị trí tham chiếu của hai backend khác
++nhau; không dùng hàm này để suy ra TCP hoặc chuyển trực tiếp translation.
++
++```bash
++python scripts/15_replay_picking.py /duong/dan/inspection --config config/picking.yaml
++```
++
++Nếu bộ inspection cũ chưa có identity/mặt phẳng, chế độ chuẩn sẽ báo thiếu dữ liệu.
++Để chỉ xem thử hình học trên dữ liệu cũ, dùng chế độ có tên rõ ràng:
++
++```bash
++python scripts/15_replay_picking.py /duong/dan/inspection --config config/picking_legacy_preview.yaml
++```
++
++Chế độ này dùng camera-Z và cho phép nền chưa có identity; chỉ dùng để phân tích
++ngoại tuyến. `reference.identity_status` cho biết giới hạn đó. Với vận hành mới,
++vẽ vùng đáy và chụp lại nền.
++
++Khi thay camera/crop/vị trí thùng/hiệu chuẩn, tăng `camera.calibration_id` rồi chụp
++lại nền. Mã không thể tự phát hiện camera bị dịch chuyển vật lý nếu cấu hình và mã
++này đều không đổi.
++
++## CLAHE và tập huấn luyện
++
++Mặc định tắt để giữ dữ liệu đầu vào của model đang có. Khi bật, ảnh thu mới và ảnh
++suy luận dùng cùng công thức. Ảnh PNG huấn luyện cũ không tự biến đổi theo cấu hình;
++cần chuẩn bị lại dữ liệu cùng công thức và đánh giá trên cùng các cảnh đã gán nhãn.
++Nếu replay không có texture_raw và công thức trước đó khác công thức mới, chương
++trình báo lỗi thay vì tăng tương phản chồng nhiều lần.
++
++## Dữ liệu cần cho lần tích hợp kế tiếp
++
++1. **Mã nguồn trên máy hiện tại**: thư mục `phoxi_yolo3d`, `scripts`, `config`,
++   `pyproject.toml` và requirements. Có thể bỏ môi trường ảo, cache, runs và ảnh lớn.
++   Cần xác nhận có sửa gì sau ba gói nguồn nêu đầu tài liệu hay không.
++2. **Các bộ inspection nguyên vẹn** lưu bằng S: thùng trống, hai hộp sát đồng phẳng,
++   hộp bị che một phần, trụ/chai đứng và nằm, vật sát thành, cảnh thiếu/nhiễu depth.
++   Giữ `scans/frame.npz`, `masks.npz`, `result.json`, `replay.yaml`, thư mục reference
++   và manifest nếu có. 5–10 cảnh đa dạng là đủ cho vòng hiệu chỉnh đầu.
++3. **Cơ khí và hiệu chuẩn**: xác nhận ngón Robotiq tiêu chuẩn hay ngón tùy biến;
++   CAD/bản vẽ và kích thước thực, adapter, vị trí TCP, chiều sâu ôm mong muốn;
++   kích thước từng lớp vật; camera cố định hay gắn cổ tay; model robot và phép biến
++   đổi camera–robot (tên hệ trục, chiều biến đổi, đơn vị).
++4. **Đánh giá YOLO/tốc độ**: cần `best.pt` đang dùng và đúng imgsz/confidence nếu
++   muốn kiểm tra lại suy luận/CLAHE. Frozen-mask replay không cần trọng số.
++
++Gói hiện tại đã kiểm thử bằng cảnh tổng hợp và camera/GUI giả lập. Chưa thử PhoXi
++thật, chuyển động Robotiq, tải checkpoint GraspNet hoặc đo độ chính xác gắp thực tế.
+--- a/README.md
++++ b/README.md
+@@ -1,4 +1,10 @@
+ # PhoXi Gen2 M + YOLO Instance Segmentation + đo 3D
++
++Bản cập nhật 0.2: xem **[CAP_NHAT_SINGLE_TARGET.md](CAP_NHAT_SINGLE_TARGET.md)** để
++chạy chọn một mục tiêu, đo chiều cao theo mặt phẳng, đề xuất tư thế camera và
++kiểm tra khoảng trống. Gói đã tích hợp bản ROI/3D và GraspNet ngoại tuyến trước đó.
++Tư thế mới luôn có `robot_ready: false`; TCP, hình học kẹp thật và quỹ đạo robot
++chưa được hiệu chuẩn trong gói này.
+ 
+ Dự án này nhận diện và phân loại từng đồ vật đang xếp chồng trong hộp, sau đó dùng
+ `PointCloud` của PhoXi để đo khoảng cách đến từng vật. Toàn bộ nhận diện, đo lường,
+--- /dev/null
++++ b/config/picking.yaml
+@@ -0,0 +1,14 @@
++# Chay tu thu muc du an: python scripts/07_run_live.py --config config/picking.yaml
++# Ke thua camera, weights, crop va cac nguong tu project.yaml.
++# R = ROI lam viec; F = chi vung day phang khi THUNG TRONG; B = chup lai nen.
++yolo:
++  confidence: 0.25
++postprocess:
++  surface:
++    height_mode: plane
++    require_reference_identity: true
++picking:
++  enabled: true
++runtime:
++  scan_mode: manual
++  debug_rejected: false
+--- /dev/null
++++ b/config/picking_legacy_preview.yaml
+@@ -0,0 +1,10 @@
++# CHI de danh gia offline inspection cu chua luu identity / mat phang day.
++# De xuat camera; khong phai du lieu dieu khien robot.
++postprocess:
++  surface:
++    height_mode: camera_z
++    require_reference_identity: false
++picking:
++  enabled: true
++  require_plane: false
++  require_reference_identity: false
+--- a/config/project.yaml
++++ b/config/project.yaml
+@@ -16,10 +16,16 @@
+   # Giu co dinh hai gia tri nay khi thu dataset va khi chay model.
+   texture_source: "LED"
+   led_power: 2048
++  # Doi ma nay sau moi lan doi vi tri camera/thung/hand-eye; chup lai nen.
++  calibration_id: "setup-001"
+ 
+ texture:
+   lower_percentile: 1.0
+   upper_percentile: 99.5
++  clahe:
++    enabled: false
++    clip_limit: 1.5
++    tile_grid_size: [8, 8]
+ 
+ capture:
+   output_dir: data/raw
+@@ -69,3 +75,89 @@
+   output_dir: results
+   save_annotated: false
+   save_jsonl: true
++  scan_mode: manual
++  interval_seconds: 2.0
++  trigger_host: "127.0.0.1"
++  trigger_port: 8765
++  mask_fill: true
++  mask_alpha: 0.22
++  debug_rejected: false
++
++postprocess:
++  roi:
++    enabled: true
++    path: config/bin_roi.json
++    prompt_if_missing: true
++    min_overlap: 0.80
++    require_center: true
++  surface:
++    enabled: true
++    path: data/calibration/bin_surface.npz
++    capture_frames: 15
++    reference_min_valid_fraction: 0.50
++    mask_erode_px: 3
++    min_mask_pixels: 30
++    min_valid_points: 30
++    min_height_mm: 5.0
++    noise_sigma_multiplier: 3.0
++    height_percentile: 90.0
++    min_raised_ratio_mask: 0.02
++    min_raised_points: 30
++    min_valid_ratio: 0.50
++    height_mode: camera_z
++    require_reference_identity: false
++    floor_roi_path: config/bin_floor_roi.json
++    plane_inlier_mm: 1.5
++    plane_min_inlier_ratio: 0.80
++    plane_max_rms_mm: 1.0
++  duplicates:
++    enabled: true
++    mask_iou: 0.45
++    containment: 0.80
++
++picking:
++  # Bat luong moi bang --config config/picking.yaml.
++  enabled: false
++  max_candidates: 3
++  min_valid_ratio: 0.50
++  min_points: 80
++  require_plane: true
++  require_roi: true
++  require_reference_identity: true
++  max_frame_age_ms: 5000
++  neighbor_jump_mm: 6.0
++  min_component_ratio: 0.70
++  core_fraction: 0.80
++  normal_radius_mm: 10.0
++  min_normal_points: 20
++  normal_inlier_deg: 20.0
++  max_normal_rms_mm: 1.5
++  max_tilt_deg: 25.0
++  plane_face_mm: 2.0
++  max_geometry_points: 12000
++  normal_map_enabled: true
++  opening_gap_mm: 2.0
++  width_uncertainty_mm: 3.0
++  max_object_width_mm: 75.0
++  max_opening_mm: 85.0
++  class_shapes:
++    hop_anibox: box
++    khoi_lap_phuong: cube
++    khoi_tru: cylinder
++    lo_nhua_nap_xanh: cylinder
++    lo_nhua_nap_do: cylinder
++  clearance:
++    enabled: true
++    # Dien kich thuoc BAO TRUM co cau that. Khong dung so uoc luong de bat verified.
++    geometry_verified: false
++    finger_thickness_mm: null
++    finger_span_mm: null
++    finger_length_mm: null
++    palm_span_mm: null
++    palm_width_mm: null
++    palm_depth_mm: null
++    insertion_depth_mm: null
++    approach_mm: 50.0
++    vertical_motion_envelope_mm: null
++    safety_margin_mm: 2.0
++    projection_max_error_px: 0.5
+--- a/phoxi_yolo3d/camera.py
++++ b/phoxi_yolo3d/camera.py
+@@ -63,8 +63,10 @@
+         texture_lower_percentile: float = 1.0,
+         texture_upper_percentile: float = 99.5,
+         roi_xyxy: Sequence[int] | None = None,
++        calibration_id: str | None = None,
+     ) -> None:
+         self.device_id = device_id
++        self.calibration_id = calibration_id
+         self.address = address
+         self.api_lib_path = api_lib_path
+         self.refresh_discovery = refresh_discovery
+@@ -223,6 +225,7 @@
+     def capture(self) -> Frame3D:
+         if self.device is None:
+             raise PhoXiCameraError("Camera chua duoc open().")
++        capture_started = datetime.now(timezone.utc).isoformat()
+         frame_id = self.device.trigger_frame(True, True)
+         frame = self.device.get_frame(frame_id, timeout_ms=self.timeout_ms)
+         if not bool(getattr(frame, "Successful", True)):
+@@ -260,6 +263,15 @@
+             )
+ 
+         frame_info = dict(getattr(frame, "Info", {}) or {})
++        frame_info["capture_started_utc"] = capture_started
++        frame_info["acquisition"] = {
++            "device_id": str(self.device_id),
++            "coordinate_space": "CameraSpace/PrimaryCamera" if self.force_camera_space else "UNVERIFIED",
++            "roi_xyxy": list(self.roi_xyxy) if self.roi_xyxy else None,
++            "source_shape_hw": [source_height, source_width],
++            "calibration_id": self.calibration_id,
++            "texture_source": self.texture_source, "led_power": self.led_power,
++        }
+         if self.roi_xyxy is not None:
+             x1, y1, x2, y2 = self.roi_xyxy
+             if not (
+--- /dev/null
++++ b/phoxi_yolo3d/clearance.py
+@@ -0,0 +1,153 @@
++"""Conservative observed approach check, never a certificate of robot safety.
++
++Boxes must bound the REAL open gripper including linkage movement. A point
++cloud without points in a box is not proof of free space: every camera ray
++through that box must have an observed surface behind its far boundary.
++Closing contact, held-object retreat and the robot arm remain unverified.
++"""
++from __future__ import annotations
++
++from itertools import product
++import numpy as np
++
++
++REQUIRED_DIMENSIONS = ("finger_thickness_mm", "finger_span_mm", "finger_length_mm",
++    "palm_span_mm", "palm_width_mm", "palm_depth_mm", "insertion_depth_mm",
++    "approach_mm", "vertical_motion_envelope_mm")
++
++
++def fit_projection(frame, max_error_px=.5):
++    """Fit only if organized XYZ supports one pinhole projection to subpixel error.
++
++    This is for scene diagnostics, not camera/robot calibration. Validate on
++    ALL valid pixels, not just the fit sample; never invent rays when it fails.
++    """
++    cloud = frame.point_cloud_mm
++    valid = np.isfinite(cloud).all(axis=2) & (cloud[..., 2] > 0)
++    y, x = np.nonzero(valid)
++    points = cloud[valid].astype(np.float64)
++    if len(points) < 30:
++        return None
++    rays = np.column_stack((points[:, :2]/points[:, 2:3], np.ones(len(points))))
++    pixels = np.column_stack((x, y))
++    index = np.linspace(0, len(points)-1, min(4000, len(points))).astype(int)
++    coefficients, _, rank, _ = np.linalg.lstsq(rays[index], pixels[index], rcond=None)
++    if rank != 3:
++        return None
++    error = np.linalg.norm(rays @ coefficients-pixels, axis=1)
++    if error.max() > max_error_px:
++        return None
++    k = np.vstack((coefficients.T, [0., 0., 1.]))
++    if abs(np.linalg.det(k)) < 1e-8:
++        return None
++    return {"matrix": k, "inverse": np.linalg.inv(k),
++            "max_error_px": float(error.max()), "source": "fitted_organized_xyz_diagnostic"}
++
++
++def approach_boxes(opening_mm, settings):
++    """Three conservative boxes swept along straight -z -> +z approach."""
++    t, span, length = (float(settings[k]) for k in REQUIRED_DIMENSIONS[:3])
++    insertion = float(settings["insertion_depth_mm"])
++    if insertion >= length:
++        raise ValueError("INSERTION_EXCEEDS_FINGER_LENGTH")
++    approach = float(settings["approach_mm"])
++    margin = float(settings.get("safety_margin_mm", 2.0))
++    vertical = float(settings["vertical_motion_envelope_mm"])
++    boxes = []
++    for sign in (-1, 1):
++        y0, y1 = sorted((sign*opening_mm/2, sign*(opening_mm/2+t)))
++        low = np.array([-span/2, y0, insertion-length-approach-vertical])-margin
++        high = np.array([span/2, y1, insertion+vertical])+margin
++        boxes.append((f"finger_{sign:+d}", low, high))
++    low = np.array([-float(settings["palm_span_mm"])/2,
++                    -float(settings["palm_width_mm"])/2,
++                    insertion-length-float(settings["palm_depth_mm"])-approach-vertical])-margin
++    high = np.array([float(settings["palm_span_mm"])/2,
++                     float(settings["palm_width_mm"])/2, insertion-length+vertical])+margin
++    boxes.append(("palm", low, high))
++    return boxes
++
++
++def check_boxes(frame, anchor, rotation, boxes, projection):
++    """Check all measured XYZ, including rejected masks and out-of-range returns."""
++    cloud = frame.point_cloud_mm
++    valid = np.isfinite(cloud).all(axis=2) & (cloud[..., 2] > 0)
++    local = (cloud[valid]-anchor) @ rotation
++    diagnostics = []
++    for name, low, high in boxes:
++        count = int(np.count_nonzero(np.all((local >= low) & (local <= high), axis=1)))
++        diagnostics.append({"part": name, "observed_collision_points": count})
++    if any(row["observed_collision_points"] for row in diagnostics):
++        return {"status": "BLOCKED", "reason": "OBSERVED_VOLUME_COLLISION", "parts": diagnostics}
++    if projection is None:
++        return {"status": "UNKNOWN", "reason": "PROJECTION_UNVERIFIED", "parts": diagnostics}
++
++    h, w = valid.shape
++    k, inverse = projection["matrix"], projection["inverse"]
++    unknown_total, checked_total = 0, 0
++    for (name, low, high), diag in zip(boxes, diagnostics):
++        corners_local = np.array(list(product(*zip(low, high))))
++        corners = corners_local @ rotation.T + anchor
++        if np.any(corners[:, 2] <= 0):
++            return {"status": "UNKNOWN", "reason": "VOLUME_BEHIND_CAMERA", "parts": diagnostics}
++        uvw = corners @ k.T
++        uv = uvw[:, :2]/uvw[:, 2:3]
++        # A one-pixel guard covers the residual fitted projection error.
++        if np.any(uv.min(axis=0) < 1) or uv[:, 0].max() > w-2 or uv[:, 1].max() > h-2:
++            return {"status": "UNKNOWN", "reason": "VOLUME_OUTSIDE_FOV", "parts": diagnostics}
++        lo = np.floor(uv.min(axis=0)-1).astype(int)
++        hi = np.ceil(uv.max(axis=0)+1).astype(int)
++        yy, xx = np.mgrid[lo[1]:hi[1]+1, lo[0]:hi[0]+1]
++        rays = np.column_stack((xx.ravel(), yy.ravel(), np.ones(xx.size))) @ inverse.T
++        directions = rays @ rotation
++        origin = -np.asarray(anchor) @ rotation
++        near = np.full(len(rays), -np.inf)
++        far = np.full(len(rays), np.inf)
++        intersects = np.ones(len(rays), bool)
++        for axis in range(3):
++            parallel = np.abs(directions[:, axis]) < 1e-12
++            intersects &= ~(parallel & ((origin[axis] < low[axis]) | (origin[axis] > high[axis])))
++            a = np.full(len(rays), -np.inf)
++            b = np.full(len(rays), np.inf)
++            moving = ~parallel
++            t0 = (low[axis]-origin[axis])/directions[moving, axis]
++            t1 = (high[axis]-origin[axis])/directions[moving, axis]
++            a[moving], b[moving] = np.minimum(t0, t1), np.maximum(t0, t1)
++            near, far = np.maximum(near, a), np.minimum(far, b)
++        intersects &= (far >= np.maximum(near, 0))
++        y, x = yy.ravel()[intersects], xx.ravel()[intersects]
++        exit_z = far[intersects]
++        # Conservative pixel neighbourhood: no hole or foreground pixel may
++        # be silently skipped at the projected box edge.
++        free = np.ones(len(x), bool)
++        for dy in (-1, 0, 1):
++            for dx in (-1, 0, 1):
++                sy, sx = np.clip(y+dy, 0, h-1), np.clip(x+dx, 0, w-1)
++                free &= valid[sy, sx] & (cloud[sy, sx, 2] > exit_z+1.0)
++        unknown = int(np.count_nonzero(~free))
++        unknown_total += unknown
++        checked_total += len(x)
++        diag.update(checked_rays=len(x), unknown_or_occluded_rays=unknown)
++    if unknown_total or not checked_total:
++        return {"status": "UNKNOWN", "reason": "UNOBSERVED_OR_OCCLUDED_VOLUME", "parts": diagnostics}
++    return {"status": "OBSERVED_APPROACH_CLEAR", "reason": None, "parts": diagnostics,
++            "projection_max_error_px": projection["max_error_px"]}
++
++
++def check_approach(frame, anchor, rotation, opening_mm, settings, projection=None):
++    incomplete = [k for k in REQUIRED_DIMENSIONS if settings.get(k) is None]
++    if not settings.get("enabled", True):
++        result = {"status": "UNKNOWN", "reason": "CLEARANCE_DISABLED"}
++    elif incomplete or not settings.get("geometry_verified", False):
++        result = {"status": "UNKNOWN", "reason": "GRIPPER_GEOMETRY_UNCONFIGURED", "missing": incomplete}
++    else:
++        try:
++            boxes = approach_boxes(opening_mm, settings)
++            result = check_boxes(frame, np.asarray(anchor), np.asarray(rotation), boxes, projection)
++        except ValueError as exc:
++            result = {"status": "UNKNOWN", "reason": str(exc)}
++    result.update(model="configured_open_gripper_swept_boxes",
++                  closing_status="NOT_VERIFIED_LINKAGE_AND_CONTACT",
++                  retreat_status="NOT_VERIFIED_HELD_OBJECT",
++                  arm_status="NOT_VERIFIED", robot_ready=False)
++    return result
+--- a/phoxi_yolo3d/config.py
++++ b/phoxi_yolo3d/config.py
+@@ -5,6 +5,8 @@
+ from typing import Any
+ 
+ import yaml
++
++from .config_validation import validate_config
+ 
+ 
+ PROJECT_ROOT = Path(__file__).resolve().parents[1]
+@@ -24,17 +26,35 @@
+ 
+ def load_config(path: str | Path | None = None) -> dict[str, Any]:
+     default = yaml.safe_load(DEFAULT_CONFIG_PATH.read_text(encoding="utf-8")) or {}
++    if not isinstance(default, dict):
++        raise ValueError("project.yaml phai la mapping YAML.")
+     if path is None:
+         config = default
+     else:
+         supplied_path = Path(path).expanduser().resolve()
+         supplied = yaml.safe_load(supplied_path.read_text(encoding="utf-8")) or {}
++        if not isinstance(supplied, dict):
++            raise ValueError("File config phai la mapping YAML.")
+         config = _deep_merge(default, supplied)
+     config["_project_root"] = str(PROJECT_ROOT)
++    config["_config_dir"] = str(DEFAULT_CONFIG_PATH.parent if path is None else supplied_path.parent)
++    validate_config(config)
+     return config
+ 
+ 
++def validate_model_classes(model_names, class_names: list[str]) -> None:
++    if len(model_names) != len(class_names):
++        raise ValueError(f"So lop model ({len(model_names)}) khac classes.txt ({len(class_names)}).")
++    if isinstance(model_names, dict) and set(model_names) != set(range(len(class_names))):
++        raise ValueError("ID lop cua model phai lien tuc tu 0, giu dung thu tu classes.txt.")
++    ordered = [str(model_names[i]) for i in range(len(class_names))]
++    if ordered != class_names:
++        raise ValueError(f"Thu tu class model {ordered} khac config {class_names}. Khong auto-label.")
++
++
+ def project_path(value: str | Path, config: dict[str, Any] | None = None) -> Path:
++    if str(value).startswith("@config/"):
++        return (Path((config or {}).get("_config_dir", DEFAULT_CONFIG_PATH.parent)) / str(value)[8:]).resolve()
+     path = Path(value).expanduser()
+     if path.is_absolute():
+         return path
+--- /dev/null
++++ b/phoxi_yolo3d/config_validation.py
+@@ -0,0 +1,100 @@
++"""Fail early for misspelled gates; never silently change threshold semantics."""
++from __future__ import annotations
++
++import math
++
++
++SURFACE_KEYS = set("""enabled path capture_frames reference_min_valid_fraction
++mask_erode_px min_mask_pixels min_valid_points min_height_mm noise_sigma_multiplier
++height_percentile min_raised_ratio_mask min_raised_points min_valid_ratio min_z_mm
++max_z_mm height_mode require_reference_identity floor_roi_path
++plane_inlier_mm plane_min_inlier_ratio plane_max_rms_mm""".split())
++PICKING_KEYS = set("""enabled max_candidates min_valid_ratio min_points require_plane
++require_roi require_reference_identity max_frame_age_ms neighbor_jump_mm
++min_component_ratio core_fraction normal_radius_mm min_normal_points
++normal_inlier_deg max_normal_rms_mm max_tilt_deg plane_face_mm
++opening_gap_mm width_uncertainty_mm max_object_width_mm max_opening_mm
++max_geometry_points normal_map_enabled class_shapes clearance""".split())
++CLEARANCE_KEYS = set("""enabled geometry_verified finger_thickness_mm finger_span_mm
++finger_length_mm palm_span_mm palm_width_mm palm_depth_mm insertion_depth_mm
++approach_mm safety_margin_mm vertical_motion_envelope_mm projection_max_error_px""".split())
++
++
++def _keys(value, allowed, path):
++    if not isinstance(value, dict):
++        raise ValueError(f"{path} phai la mapping YAML.")
++    unknown = set(value) - allowed
++    if unknown:
++        hint = " Doi min_raised_ratio thanh min_raised_ratio_mask (mau so = toan mask)." if "min_raised_ratio" in unknown else ""
++        raise ValueError(f"Khoa khong hop le o {path}: {sorted(unknown)}.{hint}")
++
++
++def _number(section, key, low=None, high=None, integer=False, nullable=False):
++    if key not in section or (nullable and section[key] is None):
++        return
++    value = section[key]
++    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
++        raise ValueError(f"{key} phai la so huu han.")
++    if integer and int(value) != value:
++        raise ValueError(f"{key} phai la so nguyen.")
++    if (low is not None and value < low) or (high is not None and value > high):
++        raise ValueError(f"{key} ngoai khoang [{low}, {high}].")
++
++
++def validate_config(config):
++    if not isinstance(config, dict):
++        raise ValueError("Cau hinh phai la mapping YAML.")
++    for name in ("camera", "texture", "measurement", "postprocess", "runtime", "picking"):
++        if name in config and not isinstance(config[name], dict):
++            raise ValueError(f"{name} phai la mapping YAML.")
++    surface = config.get("postprocess", {}).get("surface", {})
++    _keys(surface, SURFACE_KEYS, "postprocess.surface")
++    for key in ("min_raised_ratio_mask", "min_valid_ratio", "reference_min_valid_fraction", "plane_min_inlier_ratio"):
++        _number(surface, key, 0, 1)
++    for key in ("min_valid_points", "min_raised_points", "min_mask_pixels", "capture_frames"):
++        _number(surface, key, 1, integer=True)
++    _number(surface, "mask_erode_px", 0, integer=True)
++    _number(surface, "height_percentile", 0, 100)
++    for key in ("min_height_mm", "noise_sigma_multiplier", "plane_inlier_mm", "plane_max_rms_mm"):
++        _number(surface, key, 0.000001)
++    if surface.get("height_mode", "camera_z") not in ("camera_z", "plane"):
++        raise ValueError("height_mode chi nhan camera_z hoac plane.")
++    picking = config.get("picking", {})
++    _keys(picking, PICKING_KEYS, "picking")
++    for key in ("min_valid_ratio", "min_component_ratio", "core_fraction"):
++        _number(picking, key, 0.000001, 1)
++    for key in ("max_candidates", "min_points", "min_normal_points", "max_geometry_points"):
++        _number(picking, key, 1, integer=True)
++    for key in ("normal_inlier_deg", "max_tilt_deg"):
++        _number(picking, key, 0.000001, 89)
++    for key in ("max_frame_age_ms", "neighbor_jump_mm", "normal_radius_mm", "max_normal_rms_mm", "plane_face_mm", "max_object_width_mm", "max_opening_mm"):
++        _number(picking, key, 0.000001)
++    for key in ("opening_gap_mm", "width_uncertainty_mm"):
++        _number(picking, key, 0)
++    _number(picking, "max_opening_mm", .000001, 85.)
++    if picking.get("max_object_width_mm", 75.) > picking.get("max_opening_mm", 85.):
++        raise ValueError("max_object_width_mm vuot max_opening_mm cua Robotiq 2F-85.")
++    clearance = picking.get("clearance", {})
++    _keys(clearance, CLEARANCE_KEYS, "picking.clearance")
++    for key in CLEARANCE_KEYS - {"enabled", "geometry_verified"}:
++        _number(clearance, key, 0 if key in ("safety_margin_mm", "vertical_motion_envelope_mm") else .000001, nullable=True)
++    for section in (surface, picking, clearance):
++        for key in ("enabled", "require_plane", "require_roi", "require_reference_identity", "normal_map_enabled", "geometry_verified"):
++            if key in section and not isinstance(section[key], bool):
++                raise ValueError(f"{key} phai la true/false, khong phai chuoi.")
++    shapes = picking.get("class_shapes", {})
++    if not isinstance(shapes, dict) or any(v not in ("box", "cube", "cylinder", "unknown") for v in shapes.values()):
++        raise ValueError("class_shapes chi nhan box/cube/cylinder/unknown.")
++    texture = config.get("texture", {})
++    clahe = texture.get("clahe", {})
++    _keys(clahe, {"enabled", "clip_limit", "tile_grid_size"}, "texture.clahe")
++    _number(clahe, "clip_limit", .000001)
++    if "enabled" in clahe and not isinstance(clahe["enabled"], bool):
++        raise ValueError("texture.clahe.enabled phai la true/false.")
++    _number(texture, "lower_percentile", 0, 100)
++    _number(texture, "upper_percentile", 0, 100)
++    if texture.get("lower_percentile", 1) >= texture.get("upper_percentile", 99.5):
++        raise ValueError("lower_percentile phai nho hon upper_percentile.")
++    grid = clahe.get("tile_grid_size", [8, 8])
++    if not isinstance(grid, (list, tuple)) or len(grid) != 2 or any(type(v) is not int or v < 1 for v in grid):
++        raise ValueError("tile_grid_size can 2 so nguyen duong.")
+--- /dev/null
++++ b/phoxi_yolo3d/geometry.py
+@@ -0,0 +1,95 @@
++"""Millimetre geometry. No robot transforms and no synthetic depth filling."""
++from __future__ import annotations
++
++import numpy as np
++
++
++def unit(vector):
++    v = np.asarray(vector, dtype=np.float64)
++    norm = np.linalg.norm(v)
++    if not np.isfinite(norm) or norm < 1e-9:
++        raise ValueError("DEGENERATE_VECTOR")
++    return v / norm
++
++
++def toward_camera(normal, point):
++    n = unit(normal)
++    return -n if np.dot(n, -np.asarray(point)) < 0 else n
++
++
++def fit_plane(points, inlier_mm=1.5, min_ratio=.8, max_rms_mm=1.0, seed=42):
++    """RANSAC + SVD; return signed n.X+d, positive toward camera origin."""
++    points = np.asarray(points, dtype=np.float64)
++    points = points[np.isfinite(points).all(axis=1) & (points[:, 2] > 0)]
++    if len(points) < 20:
++        raise ValueError("PLANE_TOO_FEW_POINTS")
++    rng = np.random.default_rng(seed)
++    if len(points) > 8000:
++        points = points[rng.choice(len(points), 8000, replace=False)]
++    best = np.zeros(len(points), bool)
++    for _ in range(100):
++        a, b, c = points[rng.choice(len(points), 3, replace=False)]
++        n = np.cross(b-a, c-a)
++        if np.linalg.norm(n) < 1e-8:
++            continue
++        n = unit(n)
++        keep = np.abs((points-a) @ n) <= inlier_mm
++        if keep.sum() > best.sum():
++            best = keep
++    if best.sum() < 20 or best.mean() < min_ratio:
++        raise ValueError("PLANE_LOW_INLIER_RATIO")
++    for _ in range(2):
++        center = points[best].mean(axis=0)
++        _, singular, vt = np.linalg.svd(points[best]-center, full_matrices=False)
++        if singular[1] < 1e-5:
++            raise ValueError("PLANE_COLLINEAR_POINTS")
++        normal = toward_camera(vt[-1], center)
++        d = -float(center @ normal)
++        best = np.abs(points @ normal + d) <= inlier_mm
++    ratio = float(best.mean())
++    rms = float(np.sqrt(np.mean((points[best] @ normal + d)**2)))
++    if ratio < min_ratio or rms > max_rms_mm:
++        raise ValueError("PLANE_POOR_FIT")
++    return {"normal": normal.tolist(), "offset_mm": d, "inlier_ratio": ratio,
++            "rms_mm": rms, "sample_points": len(points), "origin": "explicit_floor_roi"}
++
++
++def frame_identity(frame):
++    """Only acquisition geometry/settings; never frame number or wall-clock time."""
++    data = frame.info.get("acquisition", {})
++    return {"shape_hw": list(frame.texture_bgr.shape[:2]),
++            **{k: data.get(k) for k in ("device_id", "coordinate_space", "roi_xyxy",
++              "source_shape_hw", "calibration_id", "texture_source", "led_power")}}
++
++
++def identity_status(saved, frame):
++    current = frame_identity(frame)
++    if not saved:
++        return "UNBOUND"
++    for key in set(saved) | set(current):
++        if saved.get(key) != current.get(key):
++            return "MISMATCH"
++    if not saved.get("device_id") or not saved.get("calibration_id") or saved.get("coordinate_space") != "CameraSpace/PrimaryCamera":
++        return "UNBOUND"
++    return "MATCH"
++
++
++def plane_basis(normal):
++    n = unit(normal)
++    reference = np.array([1., 0., 0.]) if abs(n[0]) < .9 else np.array([0., 1., 0.])
++    u = unit(reference-n*np.dot(reference, n))
++    return u, unit(np.cross(n, u))
++
++
++def rotation_for_jaws(normal, closing):
++    """Columns x=tangent, y=jaw closing, z=approach into the object."""
++    z = -unit(normal)
++    y = unit(np.asarray(closing)-z*np.dot(closing, z))
++    x = unit(np.cross(y, z))
++    return np.column_stack((x, y, z))
++
++
++def to_graspnet_rotation(rotation_camera):
++    """GraspNet columns: approach, jaw-closing, height. Proper SO(3) change."""
++    r = np.asarray(rotation_camera)
++    return np.column_stack((r[:, 2], r[:, 1], -r[:, 0]))
+--- a/phoxi_yolo3d/image_utils.py
++++ b/phoxi_yolo3d/image_utils.py
+@@ -1,6 +1,38 @@
+ from __future__ import annotations
+ 
+ import numpy as np
++
++
++def texture_recipe(settings):
++    cfg = settings.get("clahe", {})
++    return {"lower_percentile": float(settings.get("lower_percentile", 1.)),
++            "upper_percentile": float(settings.get("upper_percentile", 99.5)),
++            "clahe": {"enabled": bool(cfg.get("enabled", False)),
++                      "clip_limit": float(cfg.get("clip_limit", 1.5)),
++                      "tile_grid_size": list(cfg.get("tile_grid_size", [8, 8]))}}
++
++
++def prepare_frame_texture(frame, settings):
++    """Idempotent recipe shared by capture, inference and replay; raw stays intact."""
++    recipe = texture_recipe(settings)
++    previous = frame.info.get("texture_recipe")
++    if previous == recipe:
++        return frame.texture_bgr
++    if frame.texture_raw is not None:
++        image = normalize_texture(frame.texture_raw, recipe["lower_percentile"], recipe["upper_percentile"])
++    elif previous is not None:
++        raise ValueError("RAW_TEXTURE_REQUIRED_FOR_PREPROCESSING_CHANGE")
++    else:
++        image = frame.texture_bgr.copy()
++    cfg = recipe["clahe"]
++    if cfg["enabled"]:
++        import cv2
++        lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
++        lab[..., 0] = cv2.createCLAHE(clipLimit=cfg["clip_limit"], tileGridSize=tuple(cfg["tile_grid_size"])).apply(lab[..., 0])
++        image = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
++    frame.texture_bgr = image
++    frame.info["texture_recipe"] = recipe
++    return image
+ 
+ 
+ def _scale_channel(channel: np.ndarray, low_pct: float, high_pct: float) -> np.ndarray:
+--- a/phoxi_yolo3d/measurement.py
++++ b/phoxi_yolo3d/measurement.py
+@@ -6,6 +6,32 @@
+ 
+ from .image_utils import erode_mask, resize_mask_nearest
+ from .types import Frame3D, InstanceMeasurement
++
++
++def summarize_mask_3d(frame: Frame3D, mask: np.ndarray, settings: dict[str, Any]) -> InstanceMeasurement:
++    """Coarse statistics only; no component fitting or grasp geometry here."""
++    mask = resize_mask_nearest(mask, *frame.texture_bgr.shape[:2])
++    count = int(mask.sum())
++    points = frame.point_cloud_mm[mask]
++    keep = np.isfinite(points).all(axis=1) & (points[:, 2] > 0)
++    keep &= points[:, 2] >= float(settings.get("min_z_mm", 0))
++    keep &= points[:, 2] <= float(settings.get("max_z_mm", np.inf))
++    if settings.get("confidence_min") is not None:
++        if frame.confidence_map is None:
++            keep[:] = False
++        else:
++            conf = np.squeeze(frame.confidence_map)[mask]
++            keep &= np.isfinite(conf) & (conf >= float(settings["confidence_min"]))
++    points = points[keep]
++    enough = len(points) >= int(settings.get("min_valid_points", 80))
++    result = InstanceMeasurement(enough, None if enough else "TOO_FEW_POINTS", len(points), count,
++                                 len(points)/max(count, 1), measurement_kind="coarse")
++    if enough:
++        result.center_xyz_mm = tuple(float(v) for v in np.median(points, axis=0))
++        result.depth_z_median_mm = float(np.median(points[:, 2]))
++        result.distance_3d_median_mm = float(np.median(np.linalg.norm(points, axis=1)))
++        result.depth_z_p10_mm, result.depth_z_p90_mm = map(float, np.percentile(points[:, 2], [10, 90]))
++    return result
+ 
+ 
+ def measure_mask_3d(
+@@ -43,7 +69,7 @@
+     def select_points(candidate_mask: np.ndarray) -> tuple[np.ndarray, np.ndarray | None]:
+         selected = cloud_roi[candidate_mask]
+         valid_points = np.isfinite(selected).all(axis=1)
+-        valid_points &= np.any(selected != 0, axis=1)
++        valid_points &= selected[:, 2] > 0
+         valid_points &= selected[:, 2] >= float(settings.get("min_z_mm", 0.0))
+         valid_points &= selected[:, 2] <= float(settings.get("max_z_mm", np.inf))
+         selected_confidence = None
+--- /dev/null
++++ b/phoxi_yolo3d/picking.py
+@@ -0,0 +1,125 @@
++"""Rank cheaply, evaluate one candidate at a time, expose one final proposal."""
++from __future__ import annotations
++
++from datetime import datetime, timedelta, timezone
++import time
++import numpy as np
++
++from .clearance import check_approach, fit_projection
++from .geometry import identity_status
++from .target_geometry import generate_poses
++
++
++def freshness(frame, max_age_ms, offline=False):
++    now = datetime.now(timezone.utc)
++    stamp = frame.info.get("capture_started_utc", frame.timestamp_utc)
++    result = {"evaluated_at_utc": now.isoformat(), "captured_at_utc": stamp,
++              "valid_until_utc": None, "age_ms": None, "status": "UNKNOWN"}
++    try:
++        captured = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
++        if captured.tzinfo is None:
++            raise ValueError("timestamp needs timezone")
++        age = (now-captured).total_seconds()*1000
++        result.update(age_ms=age, valid_until_utc=(captured+timedelta(milliseconds=max_age_ms)).isoformat(),
++                      status="FRESH" if 0 <= age <= max_age_ms else "FUTURE_CLOCK" if age < 0 else "STALE")
++    except (ValueError, TypeError, OverflowError):
++        pass
++    if offline:
++        result["status"] = "OFFLINE_REPLAY"
++    return result
++
++
++def plan_single_target(frame, results, settings, measurement_settings, postprocessor=None, offline=False):
++    started = time.perf_counter()
++    output = {"enabled": True, "status": "NO_TARGET", "target_instance_id": None,
++              "pose": None, "ranking": [], "attempts": [], "robot_ready": False,
++              "coordinate_space": "camera", "distance_unit": "millimetre",
++              "backend": "deterministic_surface_geometry",
++              "automatic_mask_merge": False,
++              "freshness": freshness(frame, float(settings.get("max_frame_age_ms", 5000)), offline)}
++    reference = getattr(postprocessor, "surface_reference", None)
++    plane = reference.plane if reference else None
++    output["reference"] = {"identity_status": identity_status(reference.identity, frame) if reference else "MISSING",
++                           "floor_plane_available": plane is not None}
++    reasons = []
++    if settings.get("require_roi", True) and (getattr(postprocessor, "roi", None) is None
++                                             or not getattr(postprocessor, "roi_enabled", False)):
++        reasons.append("ROI_MISSING")
++    if settings.get("require_plane", True) and plane is None:
++        reasons.append("FLOOR_PLANE_MISSING")
++    if settings.get("require_reference_identity", True) and (
++            reference is None or identity_status(reference.identity, frame) != "MATCH"):
++        reasons.append("REFERENCE_IDENTITY_UNVERIFIED")
++    if not offline and output["freshness"]["status"] != "FRESH":
++        reasons.append("FRAME_"+output["freshness"]["status"])
++    if reasons:
++        output.update(reasons=reasons, timings_ms={"total": (time.perf_counter()-started)*1000})
++        return output
++    candidates = []
++    for item in results:
++        m, post = item.measurement, item.postprocess
++        eligibility = []
++        if not item.verified_3d:
++            eligibility.append("NOT_3D_VERIFIED")
++        if m.point_count < int(settings.get("min_points", 80)):
++            eligibility.append("TOO_FEW_POINTS")
++        if m.valid_ratio < float(settings.get("min_valid_ratio", .5)):
++            eligibility.append("LOW_3D_COVERAGE")
++        # Normalize only for ranking; it is not a probability of grasp success.
++        height = post.surface_height_percentile_mm or 0.
++        score = .45*min(1., m.valid_ratio) + .35*float(np.clip(height/100., 0, 1)) + .20*item.detection.score
++        row = {"instance_id": item.detection.instance_id, "class_name": item.detection.class_name,
++               "pick_score": float(score), "height_percentile_mm": float(height),
++               "height_mode": post.surface_height_mode, "valid_ratio": m.valid_ratio,
++               "eligible": not eligibility, "reasons": eligibility,
++               "full_object_integrity": "UNVERIFIED"}
++        output["ranking"].append(row)
++        if not eligibility:
++            candidates.append((score, item))
++    candidates.sort(key=lambda pair: (-pair[0], pair[1].detection.instance_id))
++    output["ranking"].sort(key=lambda row: (-row["pick_score"], row["instance_id"]))
++    ranked_at = time.perf_counter()
++    fallback = None
++    projection = None
++    projection_done = False
++    clearance_settings = settings.get("clearance", {})
++    for score, item in candidates[:int(settings.get("max_candidates", 3))]:
++        attempt = {"instance_id": item.detection.instance_id, "pick_score": float(score), "poses": []}
++        output["attempts"].append(attempt)
++        try:
++            poses = generate_poses(frame, item, settings, measurement_settings, plane)
++        except ValueError as exc:
++            attempt["reason"] = str(exc)
++            continue
++        if clearance_settings.get("geometry_verified", False) and not projection_done:
++            projection = fit_projection(frame, float(clearance_settings.get("projection_max_error_px", .5)))
++            projection_done = True
++        for pose in poses:
++            pose["clearance"] = check_approach(frame, pose["surface_anchor_xyz_mm"], pose["rotation_camera"],
++                                              pose["proposed_opening_mm"], clearance_settings, projection)
++            attempt["poses"].append(pose)
++            status = pose["clearance"]["status"]
++            if status == "BLOCKED":
++                continue
++            if fallback is None:
++                fallback = (item.detection.instance_id, pose)
++            if status == "OBSERVED_APPROACH_CLEAR":
++                output.update(status="APPROACH_CHECKED_PROPOSAL", target_instance_id=item.detection.instance_id, pose=pose)
++                break
++        if output["target_instance_id"] is not None:
++            break
++        if fallback and fallback[1]['clearance'].get('reason') in (
++                'GRIPPER_GEOMETRY_UNCONFIGURED', 'CLEARANCE_DISABLED', 'PROJECTION_UNVERIFIED'):
++            # These are frame/model limitations shared by every target. Keep
++            # one preview instead of repeating expensive geometry pointlessly.
++            break
++    if output["target_instance_id"] is None and fallback:
++        output.update(status="PREVIEW_UNVALIDATED", target_instance_id=fallback[0], pose=fallback[1])
++    # Heavy processing itself may consume the frame's time budget.
++    output["freshness"] = freshness(frame, float(settings.get("max_frame_age_ms", 5000)), offline)
++    if not offline and output["freshness"]["status"] != "FRESH":
++        output.update(status="STALE_PROPOSAL", target_instance_id=None, pose=None)
++    output["timings_ms"] = {"rank": (ranked_at-started)*1000,
++                            "geometry_and_clearance": (time.perf_counter()-ranked_at)*1000,
++                            "total": (time.perf_counter()-started)*1000}
++    return output
+--- /dev/null
++++ b/phoxi_yolo3d/picking_visualization.py
+@@ -0,0 +1,50 @@
++from __future__ import annotations
++
++import numpy as np
++
++from .clearance import fit_projection
++from .picking import freshness
++from .visualization import draw_results
++
++
++def visible_results(results, picking, debug=False):
++    if debug or not picking.get("enabled", False):
++        return results
++    return [r for r in results if r.detection.instance_id == picking.get("target_instance_id")]
++
++
++def draw_picking(frame, results, rejected, picking, *, debug=False, roi=None, alpha=.22, fill_masks=True, live=False, max_age_ms=5000):
++    import cv2
++    report = dict(picking)
++    if live and report.get("enabled"):
++        fresh = freshness(frame, max_age_ms)
++        if fresh["status"] != "FRESH":
++            report.update(status="STALE_DISPLAY", target_instance_id=None, pose=None)
++    canvas = draw_results(frame.texture_bgr, visible_results(results, report, debug),
++        rejected_results=rejected, debug_rejected=debug, roi=roi, alpha=alpha, fill_masks=fill_masks)
++    if not report.get("enabled"):
++        return canvas
++    pose = report.get("pose")
++    text = f"PICK {report.get('status')} | target={report.get('target_instance_id')} | CAMERA PROPOSAL"
++    if not pose and report.get("reasons"):
++        text += " | " + report["reasons"][0]
++    cv2.rectangle(canvas, (0, 0), (canvas.shape[1], 48 if pose else 28), (20, 20, 20), -1)
++    cv2.putText(canvas, text, (8, 20), cv2.FONT_HERSHEY_SIMPLEX, .45, (0, 210, 255), 1, cv2.LINE_AA)
++    if pose:
++        p = np.asarray(pose["surface_anchor_xyz_mm"])
++        pixel = tuple(pose["surface_anchor_uv"])
++        cv2.circle(canvas, pixel, 5, (0, 255, 255), -1)
++        label = f"surface XYZ={p[0]:.1f},{p[1]:.1f},{p[2]:.1f} mm | opening={pose['proposed_opening_mm']:.1f} | tilt={pose['tilt_deg']:.1f}"
++        cv2.putText(canvas, label, (8, 40), cv2.FONT_HERSHEY_SIMPLEX, .42, (255, 255, 255), 1, cv2.LINE_AA)
++        projection = fit_projection(frame)
++        if projection:
++            rotation = np.asarray(pose["rotation_camera"])
++            for i, (axis, colour) in enumerate((("x", (0, 0, 255)), ("y jaw", (0, 255, 0)), ("z approach", (255, 150, 0)))):
++                end = p+rotation[:, i]*20
++                if end[2] <= 0:
++                    continue
++                uvw = projection["matrix"] @ end
++                end_pixel = tuple(np.round(uvw[:2]/uvw[2]).astype(int))
++                cv2.arrowedLine(canvas, pixel, end_pixel, colour, 2, cv2.LINE_AA, tipLength=.18)
++                cv2.putText(canvas, axis, end_pixel, cv2.FONT_HERSHEY_SIMPLEX, .4, colour, 1, cv2.LINE_AA)
++    return canvas
+--- a/phoxi_yolo3d/pipeline.py
++++ b/phoxi_yolo3d/pipeline.py
+@@ -1,8 +1,10 @@
+ from __future__ import annotations
+ 
+ from typing import Any, Protocol
++import time
+ 
+-from .measurement import measure_mask_3d
++from .measurement import measure_mask_3d, summarize_mask_3d
++from .image_utils import prepare_frame_texture
+ from .duplicates import suppress_duplicate_masks
+ from .types import (
+     Frame3D,
+@@ -29,12 +31,20 @@
+         measurement_settings: dict[str, Any],
+         postprocessor: PostProcessor | None = None,
+         duplicate_settings: dict[str, Any] | None = None,
++        picking_settings: dict[str, Any] | None = None,
++        texture_settings: dict[str, Any] | None = None,
++        offline: bool = False,
+     ) -> None:
+         self.segmenter = segmenter
+         self.measurement_settings = measurement_settings
+         self.postprocessor = postprocessor
+         self.duplicate_settings = dict(duplicate_settings or {})
+         self.last_rejected: list[InstanceResult] = []
++        self.picking_settings = dict(picking_settings or {})
++        self.texture_settings = texture_settings
++        self.offline = offline
++        self.last_picking: dict[str, Any] = {"enabled": False, "robot_ready": False}
++        self.last_timings_ms: dict[str, float] = {}
+ 
+     def process_all(
+         self, frame: Frame3D
+@@ -42,10 +52,17 @@
+         """Return accepted and rejected instances without hiding debug evidence."""
+ 
+         frame.validate()
++        started = time.perf_counter()
++        if self.texture_settings is not None:
++            prepare_frame_texture(frame, self.texture_settings)
++        prepared = time.perf_counter()
++        detections = self.segmenter.predict(frame.texture_bgr)
++        detected = time.perf_counter()
+         accepted: list[InstanceResult] = []
+         rejected: list[InstanceResult] = []
+-        for detection in self.segmenter.predict(frame.texture_bgr):
+-            measurement = measure_mask_3d(
++        for detection in detections:
++            measure = summarize_mask_3d if self.picking_settings.get("enabled", False) else measure_mask_3d
++            measurement = measure(
+                 frame, detection.mask, self.measurement_settings
+             )
+             decision = (
+@@ -65,6 +82,19 @@
+         accepted, duplicates = suppress_duplicate_masks(accepted, self.duplicate_settings)
+         rejected.extend(duplicates)
+         self.last_rejected = rejected
++        gated = time.perf_counter()
++        if self.picking_settings.get("enabled", False):
++            from .picking import plan_single_target
++            self.last_picking = plan_single_target(frame, accepted, self.picking_settings,
++                self.measurement_settings, self.postprocessor, self.offline)
++            target_id = self.last_picking.get("target_instance_id")
++            for item in accepted:
++                if item.detection.instance_id == target_id:
++                    item.measurement = measure_mask_3d(frame, item.detection.mask, self.measurement_settings)
++        finished = time.perf_counter()
++        self.last_timings_ms = {"texture": (prepared-started)*1000, "segmentation": (detected-prepared)*1000,
++            "gates_and_measurements": (gated-detected)*1000, "picking_and_target_measurement": (finished-gated)*1000,
++            "total": (finished-started)*1000}
+         return accepted, rejected
+ 
+     def process(self, frame: Frame3D) -> list[InstanceResult]:
+--- a/phoxi_yolo3d/postprocess.py
++++ b/phoxi_yolo3d/postprocess.py
+@@ -110,6 +110,8 @@
+             decision.surface_valid_points = check.valid_points
+             decision.surface_raised_points = check.raised_points
+             decision.surface_raised_ratio_mask = check.raised_ratio_mask
++            decision.surface_height_mode = check.height_mode
++            decision.surface_reference_status = check.reference_status
+             decision.reason = check.reason
+             if not check.valid:
+                 decision.valid = False
+@@ -139,6 +141,7 @@
+             surface_status = (
+                 f"SURFACE: READY ({self.surface_reference.frame_count} frames)"
+             )
++            surface_status += " | FLOOR PLANE: " + ("READY" if self.surface_reference.plane else "MISSING (F then B)")
+         return [roi_status, surface_status]
+ 
+ 
+--- /dev/null
++++ b/phoxi_yolo3d/replay.py
+@@ -0,0 +1,49 @@
++"""Portable frozen-mask replay: no GPU, YOLO inference, or camera required."""
++from __future__ import annotations
++
++import hashlib
++import json
++from pathlib import Path
++import numpy as np
++
++from .storage import load_capture
++from .types import InstanceDetection
++
++
++class FrozenSegmenter:
++    def __init__(self, detections):
++        self.detections = detections
++
++    def predict(self, _image):
++        return self.detections
++
++
++def load_frozen_inspection(directory):
++    root = Path(directory).resolve()
++    manifest_path = root / "manifest.json"
++    if manifest_path.exists():
++        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
++        for name, digest in manifest.items():
++            path = (root / name).resolve()
++            if not path.is_relative_to(root) or not path.is_file():
++                raise ValueError(f"INSPECTION_FILE_MISSING: {name}")
++            if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
++                raise ValueError(f"INSPECTION_HASH_MISMATCH: {name}")
++    frame = load_capture(root / "scans" / "frame.npz")
++    record = json.loads((root / "result.json").read_text(encoding="utf-8"))
++    for key in ("frame_id", "timestamp_utc"):
++        if record.get(key) is not None and record[key] != getattr(frame, key):
++            raise ValueError(f"INSPECTION_FRAME_MISMATCH: {key}")
++    detections, seen = [], set()
++    with np.load(root / "masks.npz", allow_pickle=False) as masks:
++        for obj in record.get("objects", []) + record.get("rejected", []):
++            identifier = int(obj["instance_id"])
++            if identifier in seen:
++                raise ValueError("DUPLICATE_INSTANCE_ID")
++            seen.add(identifier)
++            mask = np.array(masks[f"instance_{identifier}"], dtype=bool)
++            if mask.shape != frame.texture_bgr.shape[:2]:
++                raise ValueError("MASK_FRAME_SHAPE_MISMATCH")
++            detections.append(InstanceDetection(identifier, int(obj["class_id"]), str(obj["class_name"]),
++                float(obj["confidence"]), tuple(obj["bbox_xyxy"]), mask))
++    return frame, FrozenSegmenter(detections)
+--- a/phoxi_yolo3d/roi.py
++++ b/phoxi_yolo3d/roi.py
+@@ -100,11 +100,14 @@
+             return 0.0, False
+         roi_mask = self.mask(binary.shape)
+         overlap = float(np.logical_and(binary, roi_mask).sum() / pixel_count)
++        # A concave mask's mean pixel can lie in a hole or another object.
++        # This is only an ROI gate; the 3D grasp anchor is computed separately.
++        from scipy.ndimage import distance_transform_edt
+         ys, xs = np.nonzero(binary)
+-        center_x = int(round(float(np.mean(xs))))
+-        center_y = int(round(float(np.mean(ys))))
+-        center_x = int(np.clip(center_x, 0, binary.shape[1] - 1))
+-        center_y = int(np.clip(center_y, 0, binary.shape[0] - 1))
++        y0, y1, x0, x1 = ys.min(), ys.max()+1, xs.min(), xs.max()+1
++        distances = distance_transform_edt(np.pad(binary[y0:y1, x0:x1], 1))[1:-1, 1:-1]
++        cy, cx = np.unravel_index(np.argmax(distances), distances.shape)
++        center_x, center_y = int(cx+x0), int(cy+y0)
+         return overlap, bool(roi_mask[center_y, center_x])
+ 
+     def draw(
+--- a/phoxi_yolo3d/surface_reference.py
++++ b/phoxi_yolo3d/surface_reference.py
+@@ -2,7 +2,7 @@
+ 
+ import json
+ import warnings
+-from dataclasses import dataclass
++from dataclasses import dataclass, field
+ from datetime import datetime, timezone
+ from pathlib import Path
+ from typing import Any, Callable, Iterable
+@@ -11,6 +11,7 @@
+ 
+ from .image_utils import erode_mask, resize_mask_nearest
+ from .types import Frame3D
++from .geometry import fit_plane, frame_identity, identity_status
+ 
+ 
+ def frame_depth_mm(frame: Frame3D) -> np.ndarray:
+@@ -42,6 +43,8 @@
+     valid_points: int = 0
+     raised_points: int = 0
+     raised_ratio_mask: float | None = None
++    height_mode: str = "camera_z"
++    reference_status: str = "UNBOUND"
+ 
+ 
+ @dataclass
+@@ -53,6 +56,9 @@
+     valid_count: np.ndarray
+     frame_count: int
+     created_utc: str
++    identity: dict = field(default_factory=dict)
++    plane: dict | None = None
++    plane_error: str | None = None
+ 
+     def __post_init__(self) -> None:
+         self.depth_mm = np.asarray(self.depth_mm, dtype=np.float32)
+@@ -66,6 +72,14 @@
+             raise ValueError("Surface valid_count va depth khong cung kich thuoc.")
+         if int(self.frame_count) < 1:
+             raise ValueError("Surface frame_count phai >= 1.")
++        if self.plane is not None:
++            normal = np.asarray(self.plane.get("normal"), dtype=float)
++            if (normal.shape != (3,) or not np.isfinite(normal).all()
++                    or abs(np.linalg.norm(normal)-1.) > 1e-4
++                    or not np.isfinite(self.plane.get("offset_mm", np.nan))
++                    or not np.isfinite(self.plane.get("rms_mm", np.nan))
++                    or self.plane["rms_mm"] < 0):
++                raise ValueError("Mat phang nen khong hop le.")
+ 
+     @classmethod
+     def from_frames(
+@@ -74,12 +88,21 @@
+         min_z_mm: float = 0.0,
+         max_z_mm: float = np.inf,
+         min_valid_fraction: float = 0.50,
++        plane_roi: np.ndarray | None = None,
++        plane_settings: dict | None = None,
+     ) -> "SurfaceReference":
+         depths: list[np.ndarray] = []
+         expected_shape: tuple[int, int] | None = None
++        identity = None
++        plane_points = []
+         for frame in frames:
+             frame.validate()
+             depth = frame_depth_mm(frame).astype(np.float32, copy=True)
++            current_identity = frame_identity(frame)
++            if identity is None:
++                identity = current_identity
++            elif identity != current_identity:
++                raise ValueError("Cac frame nen khac camera/crop/he toa do/hieu chuan.")
+             if expected_shape is None:
+                 expected_shape = depth.shape
+             elif depth.shape != expected_shape:
+@@ -91,6 +114,12 @@
+             valid &= depth <= float(max_z_mm)
+             depth[~valid] = np.nan
+             depths.append(depth)
++            if plane_roi is not None:
++                if plane_roi.shape != depth.shape:
++                    raise ValueError("Floor ROI khac kich thuoc frame.")
++                pts = frame.point_cloud_mm[valid & plane_roi]
++                if len(pts):
++                    plane_points.append(pts[::max(1, len(pts)//2000)])
+ 
+         if not depths:
+             raise ValueError("Khong co frame nao de tao be mat thung.")
+@@ -105,12 +134,23 @@
+         insufficient = valid_count < required_count
+         median[insufficient] = np.nan
+         noise_sigma[insufficient] = np.nan
++        plane, plane_error = None, None
++        if plane_roi is not None:
++            settings = plane_settings or {}
++            try:
++                plane = fit_plane(np.concatenate(plane_points) if plane_points else np.empty((0, 3)),
++                    inlier_mm=float(settings.get("plane_inlier_mm", 1.5)),
++                    min_ratio=float(settings.get("plane_min_inlier_ratio", .8)),
++                    max_rms_mm=float(settings.get("plane_max_rms_mm", 1.0)))
++            except ValueError as exc:
++                plane_error = str(exc)
+         return cls(
+             depth_mm=median.astype(np.float32),
+             noise_sigma_mm=noise_sigma.astype(np.float32),
+             valid_count=valid_count.astype(np.uint16),
+             frame_count=len(depths),
+             created_utc=datetime.now(timezone.utc).isoformat(),
++            identity=identity or {}, plane=plane, plane_error=plane_error,
+         )
+ 
+     def evaluate_mask(
+@@ -126,6 +166,13 @@
+                 reason="SURFACE_SHAPE_MISMATCH",
+                 valid_ratio=0.0,
+             )
++
++        binding = identity_status(self.identity, frame)
++        if binding == "MISMATCH" or (settings.get("require_reference_identity", False) and binding != "MATCH"):
++            return SurfaceCheck(True, "SURFACE_IDENTITY_" + binding, 0.0, reference_status=binding)
++        height_mode = settings.get("height_mode", "camera_z")
++        if height_mode == "plane" and self.plane is None:
++            return SurfaceCheck(True, "FLOOR_PLANE_MISSING", 0.0, reference_status=binding, height_mode="plane")
+ 
+         object_mask = resize_mask_nearest(mask, *current.shape)
+         erode_px = int(settings.get("mask_erode_px", 3))
+@@ -164,7 +211,17 @@
+         # In CameraSpace, a real object is closer than the empty-bin surface,
+         # therefore Z_background - Z_current is positive.
+         heights = self.depth_mm[valid] - current[valid]
++        gate_heights = heights
+         local_noise = self.noise_sigma_mm[valid]
++        if height_mode == "plane":
++            normal = np.asarray(self.plane["normal"])
++            points = frame.point_cloud_mm[valid]
++            heights = points @ normal + float(self.plane["offset_mm"])
++            # Detect change against the empty-bin surface too: static walls
++            # above the floor must not become new raised objects.
++            ray_scale = (points / points[:, 2:3]) @ normal
++            gate_heights = (current[valid] - self.depth_mm[valid]) * ray_scale
++            local_noise = np.hypot(local_noise * np.abs(ray_scale), self.plane["rms_mm"])
+         minimum_height = float(settings.get("min_height_mm", 5.0))
+         noise_multiplier = float(settings.get("noise_sigma_multiplier", 3.0))
+         local_noise = np.where(np.isfinite(local_noise), local_noise, np.inf)
+@@ -176,7 +233,7 @@
+         # alongside P99 so operators can see whether a spike dominates it.
+         height_max_mm = float(np.max(heights))
+         height_p99_mm = float(np.percentile(heights, 99.0))
+-        raised_points = int(np.count_nonzero(heights >= thresholds))
++        raised_points = int(np.count_nonzero(gate_heights >= thresholds))
+         raised_ratio = float(raised_points / valid_count)
+         raised_ratio_mask = float(raised_points / mask_count)
+         minimum_raised_ratio = float(settings.get("min_raised_ratio_mask", 0.02))
+@@ -204,17 +261,21 @@
+             valid_points=valid_count,
+             raised_points=raised_points,
+             raised_ratio_mask=raised_ratio_mask,
++            height_mode=height_mode, reference_status=binding,
+         )
+ 
+     def save(self, path: str | Path) -> Path:
+         output = Path(path)
+         output.parent.mkdir(parents=True, exist_ok=True)
+         metadata = {
+-            "format_version": 1,
++            "format_version": 2,
+             "frame_count": int(self.frame_count),
+             "created_utc": self.created_utc,
+             "shape_hw": list(self.depth_mm.shape),
+             "distance_unit": "millimetre",
++            "identity": self.identity,
++            "plane": self.plane,
++            "plane_error": self.plane_error,
+         }
+         np.savez_compressed(
+             output,
+@@ -238,6 +299,8 @@
+                 valid_count=np.array(data["valid_count"], dtype=np.uint16, copy=True),
+                 frame_count=int(metadata["frame_count"]),
+                 created_utc=str(metadata["created_utc"]),
++                identity=metadata.get("identity", {}), plane=metadata.get("plane"),
++                plane_error=metadata.get("plane_error"),
+             )
+ 
+ 
+@@ -248,6 +311,8 @@
+     max_z_mm: float,
+     min_valid_fraction: float = 0.50,
+     progress: Callable[[int, int], None] | None = None,
++    floor_roi=None,
++    plane_settings: dict | None = None,
+ ) -> SurfaceReference:
+     """Capture fresh frames from an opened camera while the bin is empty."""
+ 
+@@ -262,4 +327,6 @@
+         min_z_mm=min_z_mm,
+         max_z_mm=max_z_mm,
+         min_valid_fraction=min_valid_fraction,
++        plane_roi=None if floor_roi is None else floor_roi.mask(frames[0].texture_bgr.shape[:2]),
++        plane_settings=plane_settings,
+     )
+--- /dev/null
++++ b/phoxi_yolo3d/target_geometry.py
+@@ -0,0 +1,161 @@
++"""Detailed work for one ranked object at a time; other scene points stay intact."""
++from __future__ import annotations
++
++import numpy as np
++from scipy.sparse import coo_matrix
++from scipy.sparse.csgraph import connected_components
++
++from .geometry import fit_plane, plane_basis, rotation_for_jaws, toward_camera, unit
++from .image_utils import erode_mask, resize_mask_nearest
++
++
++def largest_surface_component(cloud, valid, jump_mm):
++    count = int(valid.sum())
++    if not count:
++        raise ValueError("NO_VALID_3D")
++    ids = np.full(valid.shape, -1, np.int32)
++    ids[valid] = np.arange(count)
++    sources, destinations = [], []
++    for a, b in ((np.s_[:, :-1], np.s_[:, 1:]), (np.s_[:-1, :], np.s_[1:, :])):
++        both = valid[a] & valid[b]
++        near = np.linalg.norm(cloud[a][both]-cloud[b][both], axis=1) <= jump_mm
++        sources.append(ids[a][both][near])
++        destinations.append(ids[b][both][near])
++    rows, cols = np.concatenate(sources), np.concatenate(destinations)
++    graph = coo_matrix((np.ones(len(rows)), (rows, cols)), shape=(count, count)).tocsr()
++    number, labels = connected_components(graph, directed=False)
++    sizes = np.bincount(labels)
++    chosen = int(np.argmax(sizes))
++    selected = np.zeros_like(valid)
++    selected[valid] = labels == chosen
++    return selected, {"component_count": int(number), "retained_ratio": float(sizes[chosen]/count),
++                      "discarded_for_geometry": int(count-sizes[chosen]),
++                      "discarded_points_still_used_for_collision": True}
++
++
++def surface_anchor(cloud, mask, core_fraction=.8):
++    import cv2
++    # Explicit border handles a mask touching all four image edges.
++    distance = cv2.distanceTransform(np.pad(mask.astype(np.uint8), 1), cv2.DIST_L2, 5)[1:-1, 1:-1]
++    core = mask & (distance >= float(distance.max())*core_fraction)
++    y, x = np.nonzero(core)
++    if not len(x):
++        raise ValueError("NO_CORE_POINT")
++    points = cloud[core]
++    robust_center = np.median(points, axis=0)
++    index = int(np.argmin(np.sum((points-robust_center)**2, axis=1)))
++    # Return one measured pixel exactly, not a component-wise synthetic median.
++    return points[index].astype(np.float64), (int(x[index]), int(y[index])), float(distance[y[index], x[index]])
++
++
++def local_surface_normal(frame, mask, anchor, settings):
++    all_points = frame.point_cloud_mm[mask]
++    local = np.linalg.norm(all_points-anchor, axis=1) <= float(settings.get("normal_radius_mm", 10.))
++    points = all_points[local]
++    minimum = int(settings.get("min_normal_points", 20))
++    if len(points) < minimum:
++        raise ValueError("NORMAL_TOO_FEW_LOCAL_POINTS")
++    rms_limit = float(settings.get("max_normal_rms_mm", 1.5))
++    fit = fit_plane(points, inlier_mm=rms_limit*2, min_ratio=.7, max_rms_mm=rms_limit)
++    svd_normal = np.asarray(fit["normal"])
++    source = "local_RANSAC_SVD"
++    normal = svd_normal
++    if frame.normal_map is not None and settings.get("normal_map_enabled", True):
++        normals = frame.normal_map[mask][local].astype(float)
++        lengths = np.linalg.norm(normals, axis=1)
++        good = np.isfinite(normals).all(axis=1) & (lengths > 1e-8)
++        normals = normals[good] / lengths[good, None]
++        positions = points[good]
++        normals[np.sum(normals * -positions, axis=1) < 0] *= -1
++        cosine = np.cos(np.deg2rad(float(settings.get("normal_inlier_deg", 20.))))
++        agree = normals @ svd_normal >= cosine
++        if agree.sum() >= minimum and agree.mean() >= .7:
++            normal = toward_camera(np.mean(normals[agree], axis=0), anchor)
++            source = "NormalMap_checked_against_local_plane"
++        elif len(normals):
++            source = "local_RANSAC_SVD_NormalMap_disagrees"
++    return normal, {"normal_source": source, "local_plane_rms_mm": fit["rms_mm"],
++                    "local_normal_points": len(points)}
++
++
++def generate_poses(frame, result, settings, measurement_settings, floor_plane=None):
++    import cv2
++    cloud = frame.point_cloud_mm
++    mask = resize_mask_nearest(result.detection.mask, *cloud.shape[:2])
++    if np.any(mask[[0, -1], :]) or np.any(mask[:, [0, -1]]):
++        raise ValueError("MASK_TOUCHES_CROP_BOUNDARY")
++    valid = mask & np.isfinite(cloud).all(axis=2) & (cloud[..., 2] > 0)
++    valid &= cloud[..., 2] >= float(measurement_settings.get("min_z_mm", 0))
++    valid &= cloud[..., 2] <= float(measurement_settings.get("max_z_mm", np.inf))
++    confidence_min = measurement_settings.get("confidence_min")
++    if confidence_min is not None:
++        if frame.confidence_map is None:
++            raise ValueError("CONFIDENCE_MAP_MISSING")
++        conf = np.squeeze(frame.confidence_map)
++        valid &= np.isfinite(conf) & (conf >= float(confidence_min))
++    clean, stats = largest_surface_component(cloud, valid, float(settings.get("neighbor_jump_mm", 6.)))
++    if stats["retained_ratio"] < float(settings.get("min_component_ratio", .7)):
++        raise ValueError("MULTIPLE_3D_SURFACES")
++    if clean.sum() < int(settings.get("min_points", 80)):
++        raise ValueError("TOO_FEW_CLEAN_POINTS")
++    core_mask = erode_mask(clean, int(measurement_settings.get("mask_erode_px", 3)))
++    if core_mask.sum() < int(settings.get("min_normal_points", 20)):
++        raise ValueError("CORE_TOO_THIN_OR_SPARSE")
++    anchor, pixel, core_radius = surface_anchor(cloud, core_mask, float(settings.get("core_fraction", .8)))
++    normal, normal_stats = local_surface_normal(frame, clean, anchor, settings)
++    vertical = np.asarray(floor_plane["normal"]) if floor_plane else np.array([0., 0., -1.])
++    tilt = float(np.rad2deg(np.arccos(np.clip(np.dot(normal, unit(vertical)), -1, 1))))
++    if tilt > float(settings.get("max_tilt_deg", 25.)):
++        raise ValueError("SURFACE_TILT_EXCEEDED")
++    points = cloud[clean].astype(float)
++    shape = settings.get("class_shapes", {}).get(result.detection.class_name, "unknown")
++    # Local upper face for box orientation; full component remains the width
++    # bound and collision evidence. Never quantile-trim to the nearest Z layer.
++    orient_points = points
++    if shape in ("box", "cube"):
++        face = np.abs((points-anchor) @ normal) <= float(settings.get("plane_face_mm", 2.))
++        if face.sum() < int(settings.get("min_points", 80)):
++            raise ValueError("TOP_FACE_UNCERTAIN")
++        orient_points = points[face]
++    u, v = plane_basis(normal)
++    planar = np.column_stack(((orient_points-anchor) @ u, (orient_points-anchor) @ v)).astype(np.float32)
++    limit = int(settings.get("max_geometry_points", 12000))
++    sample = planar[::max(1, len(planar)//limit)]
++    rect = cv2.minAreaRect(sample)
++    corners = cv2.boxPoints(rect)
++    edges = [corners[1]-corners[0], corners[2]-corners[1]]
++    edges.sort(key=np.linalg.norm)
++    if np.linalg.norm(edges[0]) < .5:
++        raise ValueError("DEGENERATE_VISIBLE_EXTENT")
++    closing_directions = [unit(e[0]*u+e[1]*v) for e in edges]
++    # Symmetry does not determine a unique yaw. Test more orientations rather
++    # than turning an unstable PCA vector into a confident wrist rotation.
++    ratio = float(np.linalg.norm(edges[1])/np.linalg.norm(edges[0]))
++    if ratio < 1.15 or shape in ("cube", "cylinder", "unknown"):
++        closing_directions.extend((unit(closing_directions[0]+closing_directions[1]),
++                                   unit(closing_directions[0]-closing_directions[1])))
++    poses = []
++    for closing in closing_directions:
++        rotation = rotation_for_jaws(normal, closing)
++        projections = (points-anchor) @ closing
++        visible_span = float(np.ptp(projections))
++        centered_bound = float(2*np.max(np.abs(projections)))
++        width = centered_bound + float(settings.get("width_uncertainty_mm", 3.))
++        opening = width + 2*float(settings.get("opening_gap_mm", 2.))
++        if width > float(settings.get("max_object_width_mm", 75.)) or opening > float(settings.get("max_opening_mm", 85.)):
++            continue
++        poses.append({
++            "surface_anchor_xyz_mm": anchor.tolist(), "surface_anchor_uv": list(pixel),
++            "surface_normal_camera": normal.tolist(), "rotation_camera": rotation.tolist(),
++            "axis_convention": "columns: x=tangent, y=jaw_closing, z=approach",
++            "translation_semantics": "measured surface anchor; NOT robot TCP or GraspNet reference point",
++            "visible_width_mm": visible_span, "centered_width_bound_mm": centered_bound,
++            "estimated_width_with_margin_mm": width, "proposed_opening_mm": opening,
++            "full_object_width_known": False, "core_radius_px": core_radius,
++            "tilt_deg": tilt, "tilt_reference": "floor_normal" if floor_plane else "camera_optical_axis",
++            "shape_hint": shape, "yaw_ambiguous": ratio < 1.15,
++            "cylinder_contact_mode": "UNVERIFIED" if shape == "cylinder" else None,
++            **stats, **normal_stats, "robot_ready": False})
++    if not poses:
++        raise ValueError("NO_ORIENTATION_WITHIN_OPENING_LIMIT")
++    return poses
+--- a/phoxi_yolo3d/types.py
++++ b/phoxi_yolo3d/types.py
+@@ -70,6 +70,7 @@
+     nearest_surface_mm: float | None = None
+     visible_extent_xyz_mm: tuple[float, float, float] | None = None
+     confidence_median: float | None = None
++    measurement_kind: str = "full_visible_surface"
+ 
+ 
+ @dataclass
+@@ -95,6 +96,8 @@
+     duplicate_of_instance_id: int | None = None
+     duplicate_mask_iou: float | None = None
+     duplicate_containment: float | None = None
++    surface_height_mode: str = "camera_z"
++    surface_reference_status: str = "UNBOUND"
+ 
+ 
+ @dataclass
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -4,7 +4,7 @@
+ 
+ [project]
+ name = "phoxi-yolo-3d"
+-version = "0.1.0"
++version = "0.2.0"
+ description = "Pure-Python PhoXi Gen2 + YOLO instance segmentation + 3D measurement pipeline"
+ readme = "README.md"
+ requires-python = ">=3.10"
+@@ -14,6 +14,7 @@
+   "opencv-python>=4.9,<5",
+   "Pillow>=10,<13",
+   "PyYAML>=6,<7",
++  "scipy>=1.10,<2",
+   "phoxi-api>=1.0,<2",
+   "ultralytics>=8.3,<9",
+ ]
+--- a/requirements.txt
++++ b/requirements.txt
+@@ -2,6 +2,7 @@
+ opencv-python>=4.9,<5
+ Pillow>=10,<13
+ PyYAML>=6,<7
++scipy>=1.10,<2
+ phoxi-api>=1.0,<2
+ ultralytics>=8.3,<9
+ 
+--- a/scripts/02_capture.py
++++ b/scripts/02_capture.py
+@@ -7,6 +7,7 @@
+ from phoxi_yolo3d.camera import PhoXiCamera
+ from phoxi_yolo3d.config import load_config, project_path
+ from phoxi_yolo3d.storage import frame_statistics, save_capture
++from phoxi_yolo3d.image_utils import prepare_frame_texture
+ 
+ 
+ def main() -> int:
+@@ -41,6 +42,7 @@
+         texture_lower_percentile=float(texture_cfg.get("lower_percentile", 1.0)),
+         texture_upper_percentile=float(texture_cfg.get("upper_percentile", 99.5)),
+         roi_xyxy=camera_cfg.get("roi_xyxy"),
++        calibration_id=camera_cfg.get("calibration_id"),
+     )
+ 
+     print(f"Se luu anh vao: {output_dir / 'images'}")
+@@ -61,6 +63,7 @@
+                 if command == "q":
+                     break
+             frame = camera.capture()
++            prepare_frame_texture(frame, texture_cfg)
+             paths = save_capture(frame, output_dir, save_3d=save_3d)
+             stats = frame_statistics(frame)
+             print(
+--- a/scripts/07_run_live.py
++++ b/scripts/07_run_live.py
+@@ -2,6 +2,7 @@
+ from __future__ import annotations
+ 
+ import argparse
++import hashlib
+ import json
+ import time
+ from datetime import datetime, timezone
+@@ -19,10 +20,11 @@
+ from phoxi_yolo3d.diagnostics import frame_diagnostics, result_counts
+ from phoxi_yolo3d.pipeline import PhoXiYoloPipeline
+ from phoxi_yolo3d.postprocess import build_postprocessor
+-from phoxi_yolo3d.roi import edit_polygon_roi
++from phoxi_yolo3d.roi import PolygonROI, edit_polygon_roi
+ from phoxi_yolo3d.storage import save_bgr_png, save_capture, utc_stem
+ from phoxi_yolo3d.surface_reference import capture_surface_reference
+ from phoxi_yolo3d.visualization import depth_preview, draw_results, make_dashboard
++from phoxi_yolo3d.picking_visualization import draw_picking
+ 
+ 
+ def append_jsonl(path: Path, record: dict) -> None:
+@@ -50,18 +52,26 @@
+     if postprocessor.roi is not None:
+         roi_path = root / 'reference' / 'bin_roi.json'
+         postprocessor.roi.save(roi_path)
+-        replay['postprocess']['roi']['path'] = str(roi_path.resolve())
++        replay['postprocess']['roi']['path'] = '@config/reference/bin_roi.json'
+     else:
+-        replay['postprocess']['roi']['path'] = str((root / 'reference' / 'missing_roi.json').resolve())
++        replay['postprocess']['roi']['path'] = '@config/reference/missing_roi.json'
+     if postprocessor.surface_reference is not None:
+         surface_path = root / 'reference' / 'bin_surface.npz'
+         postprocessor.surface_reference.save(surface_path)
+-        replay['postprocess']['surface']['path'] = str(surface_path.resolve())
++        replay['postprocess']['surface']['path'] = '@config/reference/bin_surface.npz'
+     else:
+-        replay['postprocess']['surface']['path'] = str((root / 'reference' / 'missing_surface.npz').resolve())
++        replay['postprocess']['surface']['path'] = '@config/reference/missing_surface.npz'
++    floor_source = project_path(postprocessor.surface_settings.get('floor_roi_path', 'config/bin_floor_roi.json'), config)
++    if floor_source.exists():
++        PolygonROI.load(floor_source).save(root / 'reference' / 'bin_floor_roi.json')
++    replay['postprocess']['surface']['floor_roi_path'] = '@config/reference/bin_floor_roi.json'
+     (root / 'replay.yaml').write_text(yaml.safe_dump(replay, sort_keys=False), encoding='utf-8')
++    manifest = {str(p.relative_to(root)): hashlib.sha256(p.read_bytes()).hexdigest()
++                for p in root.rglob('*') if p.is_file()}
++    (root / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
+     print(f'Da luu anh + 3D + masks + ket qua + nen tham chieu: {root}')
+     print(f"Xem lai: python scripts/08_run_offline.py {paths['scan']} --config {root / 'replay.yaml'}")
++    print(f"Chay dung masks da luu (khong can YOLO): python scripts/15_replay_picking.py {root}")
+     return root
+ 
+ 
+@@ -110,6 +120,7 @@
+         YOLOInstanceSegmenter(weights, yolo_cfg), measurement_cfg,
+         postprocessor=postprocessor,
+         duplicate_settings=config.get('postprocess', {}).get('duplicates', {}),
++        picking_settings=config.get('picking', {}), texture_settings=texture_cfg,
+     )
+     camera = PhoXiCamera(
+         device_id=args.device_id or camera_cfg.get('device_id'),
+@@ -121,6 +132,7 @@
+         texture_lower_percentile=float(texture_cfg.get('lower_percentile', 1.0)),
+         texture_upper_percentile=float(texture_cfg.get('upper_percentile', 99.5)),
+         roi_xyxy=camera_cfg.get('roi_xyxy'),
++        calibration_id=camera_cfg.get('calibration_id'),
+     )
+     session = datetime.now(timezone.utc).strftime('live_%Y%m%dT%H%M%S_%fZ')
+     output = project_path(runtime_cfg['output_dir'], config) / session
+@@ -146,7 +158,7 @@
+     for status in postprocessor.status_lines():
+         print(status)
+     print('1=manual 2=continuous 3=interval 4=trigger | Space/N=chup 1 anh P=tam dung')
+-    print('R=ROI B=nen thung trong D=chi tiet M=to mask S=luu anh+3D Q/Esc=thoat')
++    print('R=ROI F=vung day phang B=nen thung trong D=chi tiet M=to mask S=luu anh+3D Q/Esc=thoat')
+     frame = None
+     results, rejected = [], []
+     record = {}
+@@ -155,11 +167,15 @@
+     prompted_roi = False
+     dirty = True
+     dashboard = None
++    last_age_redraw = 0.0
+ 
+     def process_frame(reason, elapsed_capture=0.0):
+         nonlocal results, rejected, record, diagnostics, dirty
+         started = time.perf_counter()
+         results, rejected = pipeline.process_all(frame)
++        if reason.endswith('_same_frame') and pipeline.last_picking.get('enabled'):
++            pipeline.last_picking.update(status='RECAPTURE_REQUIRED', target_instance_id=None, pose=None,
++                reasons=['SETTINGS_CHANGED_CAPTURE_NEW_FRAME'])
+         diagnostics = frame_diagnostics(frame, measurement_cfg, postprocessor)
+         record = {
+             'frame_index': max(0, frame_index - 1) if reason.endswith('_same_frame') else frame_index,
+@@ -169,11 +185,14 @@
+             'scan_mode': schedule.mode,
+             'request_id': active_request.request_id if active_request else None,
+             'processing_ms': elapsed_capture + (time.perf_counter() - started) * 1000,
++            'pipeline_timings_ms': pipeline.last_timings_ms,
+             **result_counts(results, rejected),
+             'diagnostics': diagnostics,
+             'inference_settings': dict(yolo_cfg),
+             'objects': [item.to_dict() for item in results],
+             'rejected': [item.to_dict() for item in rejected],
++            'picking': pipeline.last_picking,
++            'robot_ready': False,
+         }
+         if runtime_cfg.get('save_jsonl', True):
+             append_jsonl(output / 'objects.jsonl', record)
+@@ -234,16 +253,20 @@
+ 
+                 # Redraw the last completed frame: no capture or YOLO on pause,
+                 # debug toggles, fill toggles or Save.
++                if (frame is not None and config.get('picking', {}).get('enabled')
++                        and time.monotonic() - last_age_redraw > .5):
++                    dirty = True
++                    last_age_redraw = time.monotonic()
+                 if cv2 is not None and dirty:
+                     if frame is None:
+                         blank = np.zeros((500, 800, 3), dtype=np.uint8)
+                         annotated, depth = blank, blank.copy()
+                     else:
+-                        annotated = draw_results(
+-                            frame.texture_bgr, results,
++                        annotated = draw_picking(
++                            frame, results, rejected, pipeline.last_picking,
+                             alpha=float(runtime_cfg.get('mask_alpha', 0.22)),
+-                            fill_masks=fill_masks, rejected_results=rejected,
+-                            debug_rejected=debug_rejected, roi=postprocessor.roi,
++                            fill_masks=fill_masks, debug=debug_rejected, roi=postprocessor.roi,
++                            live=True, max_age_ms=float(config.get('picking', {}).get('max_frame_age_ms', 5000)),
+                         )
+                         depth = depth_preview(frame.depth_mm, frame.point_cloud_mm)
+                     state = 'PAUSED' if schedule.paused else ('WAIT SIGNAL' if schedule.mode == 'trigger' else 'HOLD' if schedule.mode == 'manual' else 'RUN')
+@@ -261,7 +284,7 @@
+                         )
+                     footer.extend([
+                         '1 Manual | 2 Continuous | 3 Interval | 4 Trigger | Space/N Next | P Pause',
+-                        'R ROI | B Empty-bin background | D Details | M Fill | S Save image+3D | Q Exit',
++                        'R ROI | F Floor region | B Empty-bin background | D All objects | M Fill | S Save | Q Exit',
+                     ])
+                     dashboard = make_dashboard(annotated, depth, footer_lines=footer)
+                     cv2.imshow('PhoXi YOLO 3D', dashboard)
+@@ -269,7 +292,7 @@
+                     if captured_now and save_images:
+                         save_bgr_png(output / 'annotated' / f'frame_{frame_index - 1:06d}.png', dashboard)
+                 elif cv2 is None and captured_now and save_images:
+-                    save_bgr_png(output / 'annotated' / f'frame_{frame_index - 1:06d}.png', draw_results(frame.texture_bgr, results))
++                    save_bgr_png(output / 'annotated' / f'frame_{frame_index - 1:06d}.png', draw_picking(frame, results, rejected, pipeline.last_picking))
+                 if captured_now and args.count and frame_index >= args.count:
+                     break
+                 if cv2 is None:
+@@ -309,18 +332,36 @@
+                     if roi is not None:
+                         postprocessor.set_roi(roi, save=True)
+                         process_frame('roi_changed_same_frame')
++                elif key == ord('f') and frame is not None:
++                    broker.set_enabled(False)
++                    print('Chon CHI vung day phang cua thung TRONG, tranh thanh thung. Sau do bam B.')
++                    floor_path = project_path(postprocessor.surface_settings.get('floor_roi_path', 'config/bin_floor_roi.json'), config)
++                    floor_roi = edit_polygon_roi(frame.texture_bgr)
++                    if floor_roi is not None:
++                        floor_roi.save(floor_path)
++                        print(f'Da luu vung fit mat phang: {floor_path}; bam B de chup lai nen.')
++                        # The old plane must not survive a changed calibration region.
++                        if postprocessor.surface_reference is not None:
++                            postprocessor.surface_reference.plane = None
++                            postprocessor.surface_reference.plane_error = 'FLOOR_ROI_CHANGED_RECAPTURE_REQUIRED'
++                            postprocessor.set_surface_reference(postprocessor.surface_reference, save=True)
++                        process_frame('floor_roi_changed_same_frame')
+                 elif key == ord('b'):
+                     broker.set_enabled(False)
+                     print('Chup nen: thung phai HOAN TOAN TRONG, camera va thung dung yen.')
+                     surface_cfg = postprocessor.surface_settings
++                    floor_path = project_path(surface_cfg.get('floor_roi_path', 'config/bin_floor_roi.json'), config)
++                    floor_roi = PolygonROI.load(floor_path) if floor_path.exists() else None
+                     reference = capture_surface_reference(
+                         camera, frame_count=int(surface_cfg.get('capture_frames', 15)),
+                         min_z_mm=float(measurement_cfg.get('min_z_mm', 0.0)),
+                         max_z_mm=float(measurement_cfg.get('max_z_mm', float('inf'))),
+                         min_valid_fraction=float(surface_cfg.get('reference_min_valid_fraction', 0.50)),
+                         progress=lambda done, total: print(f'  Nen {done}/{total}'),
++                        floor_roi=floor_roi, plane_settings=surface_cfg,
+                     )
+                     postprocessor.set_surface_reference(reference, save=True)
++                    print('Floor plane:', reference.plane or reference.plane_error or 'MISSING: ve vung day bang F roi bam B')
+                     valid_bg = np.isfinite(reference.depth_mm) & (reference.depth_mm > 0)
+                     region = np.ones(valid_bg.shape, dtype=bool) if postprocessor.roi is None else postprocessor.roi.mask(valid_bg.shape)
+                     coverage = np.count_nonzero(valid_bg & region) / max(1, np.count_nonzero(region))
+--- a/scripts/08_run_offline.py
++++ b/scripts/08_run_offline.py
+@@ -13,6 +13,7 @@
+ from phoxi_yolo3d.postprocess import build_postprocessor
+ from phoxi_yolo3d.storage import load_capture, save_bgr_png
+ from phoxi_yolo3d.visualization import depth_preview, draw_results, make_dashboard
++from phoxi_yolo3d.picking_visualization import draw_picking
+ 
+ 
+ def main() -> int:
+@@ -45,6 +46,7 @@
+         config["measurement"],
+         postprocessor=postprocessor,
+         duplicate_settings=config.get("postprocess", {}).get("duplicates", {}),
++        picking_settings=config.get("picking", {}), texture_settings=config.get("texture", {}), offline=True,
+     )
+     output = project_path(config["runtime"]["output_dir"], config) / "offline"
+     output.mkdir(parents=True, exist_ok=True)
+@@ -58,13 +60,11 @@
+         diagnostics = frame_diagnostics(frame, config["measurement"], postprocessor)
+         save_bgr_png(
+             output / f"{scan.stem}_annotated.png",
+-            make_dashboard(draw_results(
+-                frame.texture_bgr,
+-                results,
++            make_dashboard(draw_picking(
++                frame, results, rejected, pipeline.last_picking,
+                 alpha=float(config["runtime"].get("mask_alpha", 0.22)),
+                 fill_masks=bool(config["runtime"].get("mask_fill", True)),
+-                rejected_results=rejected,
+-                debug_rejected=args.debug or bool(config["runtime"].get("debug_rejected", False)),
++                debug=args.debug or bool(config["runtime"].get("debug_rejected", False)),
+                 roi=postprocessor.roi,
+             ), depth_preview(frame.depth_mm, frame.point_cloud_mm), footer_lines=[
+                 f"2D={len(results)} 3D-confirmed={counts['verified_3d_count']} REJECT={len(rejected)}",
+@@ -76,11 +76,14 @@
+             {
+                 "scan": str(scan),
+                 "processing_ms": elapsed_ms,
++                "pipeline_timings_ms": pipeline.last_timings_ms,
+                 **counts,
+                 "diagnostics": diagnostics,
+                 "inference_settings": dict(yolo_cfg),
+                 "objects": [item.to_dict() for item in results],
+                 "rejected": [item.to_dict() for item in rejected],
++                "picking": pipeline.last_picking,
++                "robot_ready": False,
+             }
+         )
+         print(
+--- a/scripts/09_autolabel.py
++++ b/scripts/09_autolabel.py
+@@ -7,7 +7,7 @@
+ 
+ import numpy as np
+ 
+-from phoxi_yolo3d.config import load_class_names, load_config, project_path
++from phoxi_yolo3d.config import load_class_names, load_config, project_path, validate_model_classes
+ from phoxi_yolo3d.dataset import list_images, write_yolo_segmentation
+ 
+ 
+@@ -33,15 +33,10 @@
+     from ultralytics import YOLO
+ 
+     model = YOLO(str(weights))
+-    model_names = model.names
+-    ordered_model_names = [
+-        str(model_names[index]) if isinstance(model_names, dict) else str(model_names[index])
+-        for index in range(len(class_names))
+-    ]
+-    if ordered_model_names != class_names:
+-        raise SystemExit(
+-            f"Thu tu class model {ordered_model_names} khac config {class_names}. Khong auto-label."
+-        )
++    try:
++        validate_model_classes(model.names, class_names)
++    except ValueError as exc:
++        raise SystemExit(str(exc)) from exc
+ 
+     auto_dir.mkdir(parents=True, exist_ok=True)
+     summary = {"created": 0, "skipped_manual": 0, "skipped_existing": 0, "instances": 0}
+--- a/scripts/11_inspect_depth.py
++++ b/scripts/11_inspect_depth.py
+@@ -11,15 +11,22 @@
+ 
+ def robust_value(frame, u: int, v: int, radius: int = 2):
+     height, width = frame.texture_bgr.shape[:2]
++    if not (0 <= u < width and 0 <= v < height):
++        return None
+     x1, x2 = max(0, u - radius), min(width, u + radius + 1)
+     y1, y2 = max(0, v - radius), min(height, v + radius + 1)
+     points = frame.point_cloud_mm[y1:y2, x1:x2].reshape(-1, 3)
+-    valid = np.isfinite(points).all(axis=1) & (np.linalg.norm(points, axis=1) > 0)
++    valid = np.isfinite(points).all(axis=1) & (points[:, 2] > 0)
+     points = points[valid]
+     if not len(points):
+         return None
+     center = np.median(points, axis=0)
+     return center, float(np.median(np.linalg.norm(points, axis=1)))
++
++
++def pane_pixel(x: int, y: int, width: int, height: int):
++    """OpenCV mouse coordinates are in the displayed image (before window scaling)."""
++    return (x % width, y) if 0 <= x < 2 * width and 0 <= y < height else (-1, -1)
+ 
+ 
+ def main() -> int:
+@@ -39,7 +46,7 @@
+ 
+     def mouse(event, x, y, flags, param):
+         del event, flags, param
+-        state["u"], state["v"] = x, y
++        state["u"], state["v"] = pane_pixel(x, y, texture.shape[1], texture.shape[0])
+ 
+     cv2.namedWindow(window, cv2.WINDOW_NORMAL)
+     cv2.setMouseCallback(window, mouse)
+--- /dev/null
++++ b/scripts/15_replay_picking.py
+@@ -0,0 +1,48 @@
++#!/usr/bin/env python3
++from __future__ import annotations
++
++import argparse
++import json
++from pathlib import Path
++from phoxi_yolo3d.config import load_config
++from phoxi_yolo3d.pipeline import PhoXiYoloPipeline
++from phoxi_yolo3d.postprocess import build_postprocessor
++from phoxi_yolo3d.picking_visualization import draw_picking
++from phoxi_yolo3d.replay import load_frozen_inspection
++from phoxi_yolo3d.storage import save_bgr_png
++
++
++def main():
++    parser = argparse.ArgumentParser(description="Replay masks va 3D da luu; khong can camera/YOLO/GPU.")
++    parser.add_argument("inspection", type=Path)
++    parser.add_argument("--config", type=Path, help="Override de thu nguong; mac dinh replay.yaml cua scan.")
++    parser.add_argument("--debug", action="store_true")
++    parser.add_argument("--output", type=Path)
++    args = parser.parse_args()
++    root = args.inspection.resolve()
++    frame, segmenter = load_frozen_inspection(root)
++    config = load_config(args.config or root / "replay.yaml")
++    # Saved local references belong to this frame, even when testing new settings.
++    for key, name in (("roi", "bin_roi.json"), ("surface", "bin_surface.npz")):
++        config.setdefault("postprocess", {}).setdefault(key, {})["path"] = str(root / "reference" / name)
++    config["picking"]["enabled"] = True
++    post = build_postprocessor(config)
++    pipeline = PhoXiYoloPipeline(segmenter, config["measurement"], post,
++        config.get("postprocess", {}).get("duplicates", {}), config["picking"], config["texture"], offline=True)
++    accepted, rejected = pipeline.process_all(frame)
++    output = args.output or root / "picking_replay"
++    output.mkdir(parents=True, exist_ok=True)
++    report = {"frame_id": frame.frame_id, "timestamp_utc": frame.timestamp_utc,
++              "objects": [r.to_dict() for r in accepted], "rejected": [r.to_dict() for r in rejected],
++              "picking": pipeline.last_picking, "robot_ready": False}
++    report['pipeline_timings_ms'] = pipeline.last_timings_ms
++    (output / "picking.json").write_text(json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
++    save_bgr_png(output / "target.png", draw_picking(frame, accepted, rejected, pipeline.last_picking,
++                                                   debug=args.debug, roi=post.roi))
++    print(json.dumps({"status": pipeline.last_picking["status"], "target": pipeline.last_picking["target_instance_id"],
++                      "output": str(output), "robot_ready": False}, ensure_ascii=False))
++    return 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+--- /dev/null
++++ b/tests/test_picking.py
+@@ -0,0 +1,346 @@
++import copy
++import importlib.util
++import json
++import tempfile
++import unittest
++from datetime import datetime, timedelta, timezone
++from pathlib import Path
++from unittest.mock import patch
++
++import numpy as np
++
++from phoxi_yolo3d.clearance import check_approach, check_boxes, fit_projection
++from phoxi_yolo3d.config import load_config, validate_model_classes
++from phoxi_yolo3d.config_validation import validate_config
++from phoxi_yolo3d.geometry import fit_plane, rotation_for_jaws, to_graspnet_rotation
++from phoxi_yolo3d.image_utils import prepare_frame_texture
++from phoxi_yolo3d.measurement import summarize_mask_3d
++from phoxi_yolo3d.picking import freshness, plan_single_target
++from phoxi_yolo3d.picking_visualization import visible_results
++from phoxi_yolo3d.pipeline import PhoXiYoloPipeline
++from phoxi_yolo3d.postprocess import InstancePostProcessor
++from phoxi_yolo3d.replay import FrozenSegmenter, load_frozen_inspection
++from phoxi_yolo3d.roi import PolygonROI
++from phoxi_yolo3d.surface_reference import SurfaceReference
++from phoxi_yolo3d.target_geometry import generate_poses, surface_anchor
++from phoxi_yolo3d.types import Frame3D, InstanceDetection, InstanceResult, PostprocessDecision
++
++
++def synthetic_frame(z=800., height=160, width=200, normal=None, offset=None):
++    yy, xx = np.mgrid[:height, :width]
++    rays = np.stack(((xx-width/2)/300., (yy-height/2)/300., np.ones_like(xx)), axis=2)
++    if normal is not None:
++        depth = -float(offset)/(rays @ normal)
++    else:
++        depth = np.full((height, width), z)
++    cloud = (rays*depth[..., None]).astype(np.float32)
++    frame = Frame3D(np.full((height, width, 3), 100, np.uint8), cloud,
++                    normal_map=np.broadcast_to([0., 0., -1.], cloud.shape).copy().astype(np.float32),
++                    frame_id=12, timestamp_utc=datetime.now(timezone.utc).isoformat())
++    frame.info['acquisition'] = {'device_id': 'TEST-CAMERA', 'coordinate_space': 'CameraSpace/PrimaryCamera',
++        'roi_xyxy': [0, 0, width, height], 'source_shape_hw': [height, width], 'calibration_id': 'test-1',
++        'texture_source': 'LED', 'led_power': 2048}
++    return frame
++
++
++def put_object(frame, identifier=0, region=(45, 65, 60, 90), z=740., name='hop_anibox'):
++    y0, y1, x0, x1 = region
++    mask = np.zeros(frame.texture_bgr.shape[:2], bool)
++    mask[y0:y1, x0:x1] = True
++    rays = frame.point_cloud_mm[mask]/frame.point_cloud_mm[mask, 2:3]
++    frame.point_cloud_mm[mask] = rays*z
++    return InstanceDetection(identifier, 0, name, .95, (x0, y0, x1, y1), mask)
++
++
++def result_for(frame, detection, height=60.):
++    measurement = summarize_mask_3d(frame, detection.mask, {'min_valid_points': 30})
++    return InstanceResult(detection, measurement, PostprocessDecision(surface_status='PASS',
++        surface_height_mode='plane', surface_height_percentile_mm=height))
++
++
++def picking_settings():
++    settings = copy.deepcopy(load_config('config/picking.yaml')['picking'])
++    settings.update(require_roi=False, require_plane=False, require_reference_identity=False)
++    return settings
++
++
++def plane_post(background):
++    post = InstancePostProcessor(roi_settings={'enabled': False}, surface_settings={
++        'height_mode': 'plane', 'require_reference_identity': True, 'min_valid_points': 30,
++        'mask_erode_px': 1})
++    post.surface_reference = SurfaceReference.from_frames([background], plane_roi=np.ones(background.texture_bgr.shape[:2], bool))
++    return post
++
++
++class ConfigurationRegressionTests(unittest.TestCase):
++    def test_old_threshold_key_is_not_silently_ignored(self):
++        config = load_config()
++        config['postprocess']['surface']['min_raised_ratio'] = .2
++        with self.assertRaisesRegex(ValueError, 'min_raised_ratio_mask'):
++            validate_config(config)
++
++    def test_numeric_and_boolean_gates_reject_invalid_values(self):
++        for key, value in [('max_candidates', 1.5), ('max_tilt_deg', 95), ('enabled', 'false'), ('min_valid_ratio', float('nan'))]:
++            config = load_config()
++            config['picking'][key] = value
++            with self.assertRaises(ValueError):
++                validate_config(config)
++
++    def test_class_count_order_and_noncontiguous_ids(self):
++        for names in ({0: 'a'}, {0: 'a', 1: 'b', 2: 'c'}, {1: 'a', 2: 'b'}, ['b', 'a']):
++            with self.assertRaises(ValueError):
++                validate_model_classes(names, ['a', 'b'])
++        validate_model_classes({0: 'a', 1: 'b'}, ['a', 'b'])
++
++    def test_mouse_right_pane_and_invalid_border(self):
++        path = Path(__file__).parents[1] / 'scripts/11_inspect_depth.py'
++        spec = importlib.util.spec_from_file_location('inspector', path)
++        module = importlib.util.module_from_spec(spec)
++        spec.loader.exec_module(module)
++        self.assertEqual(module.pane_pixel(230, 50, 200, 160), (30, 50))
++        self.assertEqual(module.pane_pixel(400, 50, 200, 160), (-1, -1))
++        self.assertIsNone(module.robust_value(synthetic_frame(), -1, 5))
++
++    def test_clahe_repeated_replay_is_idempotent_and_raw_unchanged(self):
++        frame = synthetic_frame()
++        frame.texture_raw = np.arange(160*200, dtype=np.uint16).reshape(160, 200)
++        raw = frame.texture_raw.copy()
++        settings = {'clahe': {'enabled': True, 'clip_limit': 1.5, 'tile_grid_size': [8, 8]}}
++        first = prepare_frame_texture(frame, settings).copy()
++        second = prepare_frame_texture(frame, settings)
++        np.testing.assert_array_equal(first, second)
++        np.testing.assert_array_equal(raw, frame.texture_raw)
++
++
++class ReferenceGeometryTests(unittest.TestCase):
++    def test_tilted_floor_reports_perpendicular_height_and_round_trips(self):
++        n = np.array([np.sin(np.deg2rad(25)), 0., -np.cos(np.deg2rad(25))])
++        background = synthetic_frame(normal=n, offset=800.)
++        reference = SurfaceReference.from_frames([background], plane_roi=np.ones((160, 200), bool))
++        frame = copy.deepcopy(background)
++        mask = np.zeros((160, 200), bool)
++        mask[40:90, 60:110] = True
++        rays = frame.point_cloud_mm[mask]/frame.point_cloud_mm[mask, 2:3]
++        frame.point_cloud_mm[mask] = rays*((20-800)/(rays @ n))[:, None]
++        check = reference.evaluate_mask(frame, mask, {'height_mode': 'plane', 'mask_erode_px': 0})
++        self.assertEqual(check.status, 'PASS')
++        self.assertAlmostEqual(check.height_percentile_mm, 20., places=2)
++        axial = reference.evaluate_mask(frame, mask, {'mask_erode_px': 0})
++        self.assertGreater(abs(axial.height_percentile_mm-20), 1.)
++        with tempfile.TemporaryDirectory() as directory:
++            path = Path(directory)/'plane.npz'
++            reference.save(path)
++            loaded = SurfaceReference.load(path)
++            self.assertEqual(loaded.identity, reference.identity)
++            np.testing.assert_allclose(loaded.plane['normal'], n, atol=1e-5)
++
++    def test_same_shape_different_crop_is_unknown(self):
++        background = synthetic_frame()
++        reference = SurfaceReference.from_frames([background])
++        frame = copy.deepcopy(background)
++        d = put_object(frame)
++        frame.info['acquisition']['roi_xyxy'] = [1, 0, 201, 160]
++        check = reference.evaluate_mask(frame, d.mask, {})
++        self.assertEqual(check.reason, 'SURFACE_IDENTITY_MISMATCH')
++        self.assertEqual(check.status, 'UNKNOWN')
++
++    def test_legacy_reference_cannot_satisfy_strict_identity(self):
++        reference = SurfaceReference.from_frames([synthetic_frame()])
++        reference.identity = {}
++        frame = synthetic_frame()
++        d = put_object(frame)
++        self.assertEqual(reference.evaluate_mask(frame, d.mask, {'require_reference_identity': True}).status, 'UNKNOWN')
++
++    def test_unmoved_wall_above_floor_is_not_a_new_object(self):
++        background = synthetic_frame()
++        wall = put_object(background, z=740)
++        floor = ~wall.mask
++        ref = SurfaceReference.from_frames([background], plane_roi=floor)
++        result = ref.evaluate_mask(background, wall.mask, {'height_mode': 'plane'})
++        self.assertEqual(result.status, 'REJECT')
++        self.assertGreater(result.height_percentile_mm, 50)
++
++    def test_plane_fit_rejects_collinear_or_missing_data(self):
++        for points in (np.zeros((30, 3)), np.column_stack((np.arange(50), np.zeros(50), np.ones(50)*800))):
++            with self.assertRaises(ValueError):
++                fit_plane(points)
++
++
++class TargetGeometryTests(unittest.TestCase):
++    def test_u_shaped_anchor_is_one_measured_surface_point(self):
++        frame = synthetic_frame()
++        mask = np.zeros((160, 200), bool)
++        mask[30:90, 50:65] = True
++        mask[30:90, 95:110] = True
++        mask[75:90, 50:110] = True
++        anchor, (u, v), _ = surface_anchor(frame.point_cloud_mm, mask)
++        self.assertTrue(mask[v, u])
++        np.testing.assert_array_equal(anchor, frame.point_cloud_mm[v, u])
++        y, x = np.nonzero(mask)
++        self.assertFalse(mask[round(y.mean()), round(x.mean())])
++
++    def test_mixed_normal_signs_and_rotation_conventions(self):
++        frame = synthetic_frame()
++        d = put_object(frame)
++        frame.normal_map[::2] *= -1
++        poses = generate_poses(frame, result_for(frame, d), picking_settings(), {'mask_erode_px': 2})
++        pose = poses[0]
++        self.assertIn('NormalMap', pose['normal_source'])
++        np.testing.assert_allclose(pose['surface_normal_camera'], [0, 0, -1], atol=1e-6)
++        r = np.array(pose['rotation_camera'])
++        np.testing.assert_allclose(r.T@r, np.eye(3), atol=1e-6)
++        self.assertAlmostEqual(np.linalg.det(r), 1.)
++        g = to_graspnet_rotation(r)
++        self.assertAlmostEqual(np.linalg.det(g), 1.)
++        np.testing.assert_allclose(g[:, 0], r[:, 2])
++
++    def test_large_normalmap_error_uses_measured_geometry(self):
++        frame = synthetic_frame()
++        d = put_object(frame)
++        frame.normal_map[:] = [1, 0, 0]
++        poses = generate_poses(frame, result_for(frame, d), picking_settings(), {})
++        self.assertIn('disagrees', poses[0]['normal_source'])
++
++    def test_lower_surface_contamination_removed_but_recorded(self):
++        frame = synthetic_frame()
++        d = put_object(frame, region=(40, 65, 60, 90))
++        lower = np.zeros(d.mask.shape, bool)
++        lower[60:65, 60:90] = True
++        ray = frame.point_cloud_mm[lower]/frame.point_cloud_mm[lower, 2:3]
++        frame.point_cloud_mm[lower] = ray*780.
++        poses = generate_poses(frame, result_for(frame, d), picking_settings(), {'mask_erode_px': 2})
++        self.assertEqual(poses[0]['surface_anchor_xyz_mm'][2], 740.)
++        self.assertGreater(poses[0]['discarded_for_geometry'], 100)
++        self.assertTrue(poses[0]['discarded_points_still_used_for_collision'])
++
++    def test_square_top_retains_multiple_yaws(self):
++        frame = synthetic_frame()
++        d = put_object(frame, region=(40, 60, 60, 80), name='khoi_lap_phuong')
++        poses = generate_poses(frame, result_for(frame, d), picking_settings(), {})
++        self.assertGreaterEqual(len(poses), 4)
++        self.assertTrue(all(p['yaw_ambiguous'] for p in poses))
++
++    def test_opening_budget_and_crop_edge_are_rejections(self):
++        frame = synthetic_frame()
++        d = put_object(frame, region=(40, 78, 60, 98))
++        with self.assertRaisesRegex(ValueError, 'OPENING_LIMIT'):
++            generate_poses(frame, result_for(frame, d), picking_settings(), {})
++        d = put_object(frame, region=(0, 30, 60, 80))
++        with self.assertRaisesRegex(ValueError, 'CROP_BOUNDARY'):
++            generate_poses(frame, result_for(frame, d), picking_settings(), {})
++
++    def test_tilt_is_rejected_not_clamped(self):
++        n = np.array([np.sin(np.deg2rad(35)), 0., -np.cos(np.deg2rad(35))])
++        frame = synthetic_frame(normal=n, offset=600)
++        mask = np.zeros((160, 200), bool)
++        mask[40:70, 60:90] = True
++        d = InstanceDetection(0, 0, 'hop_anibox', .9, (60, 40, 90, 70), mask)
++        with self.assertRaisesRegex(ValueError, 'TILT'):
++            generate_poses(frame, result_for(frame, d), picking_settings(), {})
++
++
++class ClearanceTests(unittest.TestCase):
++    def setUp(self):
++        self.frame = synthetic_frame()
++        self.anchor = np.array([0., 0., 700.])
++        self.rotation = np.eye(3)
++        self.boxes = [('test_finger', np.array([-10., -10., -20.]), np.array([10., 10., 10.]))]
++
++    def check(self):
++        return check_boxes(self.frame, self.anchor, self.rotation, self.boxes, fit_projection(self.frame))
++
++    def test_empty_measured_approach_is_observed_clear(self):
++        self.assertEqual(self.check()['status'], 'OBSERVED_APPROACH_CLEAR')
++
++    def test_missing_ray_is_unknown_not_free(self):
++        self.frame.point_cloud_mm[80, 100] = 0
++        self.assertEqual(self.check()['status'], 'UNKNOWN')
++
++    def test_foreground_occlusion_is_unknown_not_free(self):
++        self.frame.point_cloud_mm[80, 100] = [0, 0, 650]
++        self.assertEqual(self.check()['status'], 'UNKNOWN')
++
++    def test_off_center_obstacle_inside_finger_volume_is_blocked(self):
++        # Obstacle is away from the center ray. Two sample points could miss it.
++        y, x = 82, 103
++        self.frame.point_cloud_mm[y, x] = [(x-100)*700/300, (y-80)*700/300, 700]
++        self.assertEqual(self.check()['status'], 'BLOCKED')
++
++    def test_fov_boundary_cannot_be_certified(self):
++        self.anchor[0] = 230.
++        self.assertEqual(self.check()['reason'], 'VOLUME_OUTSIDE_FOV')
++
++    def test_missing_dimensions_and_disabled_check_are_unknown(self):
++        for settings in ({}, {'enabled': False}):
++            result = check_approach(self.frame, self.anchor, self.rotation, 50., settings)
++            self.assertEqual(result['status'], 'UNKNOWN')
++            self.assertFalse(result['robot_ready'])
++
++    def test_nonprojective_cloud_fails_visibility_inference(self):
++        self.frame.point_cloud_mm[40, 50, 0] += 100
++        self.assertIsNone(fit_projection(self.frame))
++
++
++class SelectionTests(unittest.TestCase):
++    def test_blocked_first_target_falls_back_and_display_is_one_object(self):
++        frame = synthetic_frame()
++        first = put_object(frame)
++        second = put_object(frame, 1, (95, 115, 125, 155), 750)
++        items = [result_for(frame, first, 60), result_for(frame, second, 50)]
++        def clearance(_frame, anchor, *_args):
++            return {'status': 'BLOCKED' if anchor[0] < 0 else 'OBSERVED_APPROACH_CLEAR', 'robot_ready': False}
++        with patch('phoxi_yolo3d.picking.check_approach', side_effect=clearance):
++            plan = plan_single_target(frame, items, picking_settings(), {}, offline=True)
++        self.assertEqual(plan['target_instance_id'], 1)
++        self.assertEqual(len(plan['attempts']), 2)
++        self.assertEqual([x.detection.instance_id for x in visible_results(items, plan)], [1])
++        self.assertEqual(len(visible_results(items, plan, debug=True)), 2)
++        self.assertFalse(plan['robot_ready'])
++
++    def test_missing_geometry_is_explicit_preview(self):
++        frame = synthetic_frame()
++        d = put_object(frame)
++        plan = plan_single_target(frame, [result_for(frame, d)], picking_settings(), {}, offline=True)
++        self.assertEqual(plan['status'], 'PREVIEW_UNVALIDATED')
++        self.assertFalse(plan['pose']['full_object_width_known'])
++        self.assertEqual(plan['pose']['clearance']['reason'], 'GRIPPER_GEOMETRY_UNCONFIGURED')
++        json.dumps(plan, allow_nan=False)
++
++    def test_sparse_detection_retained_but_not_selected(self):
++        frame = synthetic_frame()
++        d = put_object(frame)
++        y, x = np.nonzero(d.mask)
++        frame.point_cloud_mm[y[:400], x[:400]] = 0
++        plan = plan_single_target(frame, [result_for(frame, d)], picking_settings(), {}, offline=True)
++        self.assertIsNone(plan['target_instance_id'])
++        self.assertIn('LOW_3D_COVERAGE', plan['ranking'][0]['reasons'])
++
++    def test_stale_unknown_future_and_offline_timestamps(self):
++        frame = synthetic_frame()
++        frame.timestamp_utc = (datetime.now(timezone.utc)-timedelta(seconds=10)).isoformat()
++        self.assertEqual(freshness(frame, 5000)['status'], 'STALE')
++        d = put_object(frame)
++        plan = plan_single_target(frame, [result_for(frame, d)], picking_settings(), {})
++        self.assertIsNone(plan['target_instance_id'])
++        self.assertEqual(freshness(frame, 5000, offline=True)['status'], 'OFFLINE_REPLAY')
++        frame.timestamp_utc = 'invalid'
++        self.assertEqual(freshness(frame, 5000)['status'], 'UNKNOWN')
++        frame.timestamp_utc = (datetime.now(timezone.utc)+timedelta(seconds=10)).isoformat()
++        self.assertEqual(freshness(frame, 5000)['status'], 'FUTURE_CLOCK')
++
++    def test_pipeline_computes_full_measurement_only_for_selected_target(self):
++        background = synthetic_frame()
++        frame = copy.deepcopy(background)
++        detections = [put_object(frame), put_object(frame, 1, (95, 115, 125, 155), 750)]
++        pipeline = PhoXiYoloPipeline(FrozenSegmenter(detections), {'min_valid_points': 30}, plane_post(background),
++                                   picking_settings=picking_settings(), offline=True)
++        accepted, rejected = pipeline.process_all(frame)
++        self.assertFalse(rejected)
++        target = pipeline.last_picking['target_instance_id']
++        self.assertIsNotNone(target)
++        self.assertEqual(sum(x.measurement.measurement_kind == 'full_visible_surface' for x in accepted), 1)
++        self.assertEqual(len(accepted), 2)
++
++
++if __name__ == '__main__':
++    unittest.main()
+--- /dev/null
++++ b/tests/test_picking_integration.py
+@@ -0,0 +1,120 @@
++import copy
++import importlib.util
++import io
++import json
++import os
++import shutil
++import subprocess
++import sys
++import tempfile
++import unittest
++from contextlib import redirect_stdout
++from pathlib import Path
++from unittest.mock import patch
++
++import cv2
++import numpy as np
++
++from phoxi_yolo3d.config import load_config
++from phoxi_yolo3d.pipeline import PhoXiYoloPipeline
++from phoxi_yolo3d.picking_visualization import draw_picking
++from phoxi_yolo3d.replay import FrozenSegmenter, load_frozen_inspection
++from phoxi_yolo3d.roi import PolygonROI
++from test_picking import synthetic_frame, put_object, plane_post
++
++
++ROOT = Path(__file__).parents[1]
++
++
++def live_module():
++    spec = importlib.util.spec_from_file_location('picking_live', ROOT / 'scripts/07_run_live.py')
++    module = importlib.util.module_from_spec(spec)
++    spec.loader.exec_module(module)
++    return module
++
++
++def scene():
++    background = synthetic_frame()
++    frame = copy.deepcopy(background)
++    detections = [put_object(frame), put_object(frame, 1, (95, 115, 125, 155), 750)]
++    post = plane_post(background)
++    post.roi = PolygonROI([(0, 0), (1, 0), (1, 1), (0, 1)])
++    post.roi_settings['enabled'] = True
++    config = load_config(ROOT / 'config/picking.yaml')
++    return frame, detections, post, config
++
++
++class PickingIntegrationTests(unittest.TestCase):
++    def test_save_move_and_cli_replay_without_yolo_or_camera(self):
++        frame, detections, post, config = scene()
++        pipeline = PhoXiYoloPipeline(FrozenSegmenter(detections), config['measurement'], post,
++                                    picking_settings=config['picking'], offline=True)
++        accepted, rejected = pipeline.process_all(frame)
++        self.assertIsNotNone(pipeline.last_picking['target_instance_id'])
++        record = {'frame_id': frame.frame_id, 'timestamp_utc': frame.timestamp_utc,
++                  'objects': [r.to_dict() for r in accepted], 'rejected': [r.to_dict() for r in rejected],
++                  'picking': pipeline.last_picking, 'robot_ready': False}
++        image = draw_picking(frame, accepted, rejected, pipeline.last_picking)
++        with tempfile.TemporaryDirectory() as directory, redirect_stdout(io.StringIO()):
++            root = live_module().save_inspection(Path(directory), frame, record, accepted, rejected, image, config, post)
++            moved = Path(directory) / 'moved-inspection'
++            shutil.move(str(root), moved)
++            loaded, frozen = load_frozen_inspection(moved)
++            np.testing.assert_array_equal(loaded.point_cloud_mm, frame.point_cloud_mm)
++            self.assertEqual(len(frozen.predict(None)), 2)
++            environment = {**os.environ, 'PYTHONPATH': str(ROOT)}
++            completed = subprocess.run([sys.executable, str(ROOT/'scripts/15_replay_picking.py'), str(moved)],
++                cwd=directory, env=environment, capture_output=True, text=True, timeout=30)
++            self.assertEqual(completed.returncode, 0, completed.stderr)
++            report = json.loads((moved/'picking_replay/picking.json').read_text())
++            self.assertEqual(report['picking']['target_instance_id'], pipeline.last_picking['target_instance_id'])
++            self.assertEqual(report['picking']['freshness']['status'], 'OFFLINE_REPLAY')
++            self.assertTrue((moved/'picking_replay/target.png').exists())
++            with (moved/'masks.npz').open('ab') as stream:
++                stream.write(b'changed')
++            with self.assertRaisesRegex(ValueError, 'HASH_MISMATCH'):
++                load_frozen_inspection(moved)
++
++    def test_live_single_target_debug_and_save_do_not_recapture_or_rerun(self):
++        frame, detections, post, config = scene()
++        live = live_module()
++        captures, predictions = [], []
++        class Camera:
++            device_id = 'TEST-CAMERA'
++            def __init__(self, **kwargs): pass
++            def __enter__(self): return self
++            def __exit__(self, *_args): pass
++            def capture(self):
++                captures.append(1)
++                return copy.deepcopy(frame)
++        class Segmenter:
++            def __init__(self, *_args): pass
++            def predict(self, _image):
++                predictions.append(1)
++                return detections
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            weights = root/'fake.pt'
++            weights.touch()
++            config['yolo']['weights'] = str(weights)
++            config['runtime']['output_dir'] = str(root/'results')
++            with patch.object(live, 'load_config', return_value=config), \
++                 patch.object(live, 'build_postprocessor', return_value=post), \
++                 patch.object(live, 'PhoXiCamera', Camera), \
++                 patch.object(live, 'YOLOInstanceSegmenter', Segmenter), \
++                 patch.object(cv2, 'imshow'), patch.object(cv2, 'destroyAllWindows'), \
++                 patch.object(cv2, 'waitKey', side_effect=[ord('d'), ord('m'), ord('s'), ord('p'), -1, ord('q')]), \
++                 patch('sys.argv', ['07_run_live.py']), redirect_stdout(io.StringIO()):
++                self.assertEqual(live.main(), 0)
++            self.assertEqual(len(captures), 1)
++            self.assertEqual(len(predictions), 1)
++            reports = list(root.glob('results/*/inspection_*/result.json'))
++            self.assertEqual(len(reports), 1)
++            record = json.loads(reports[0].read_text())
++            self.assertIsNotNone(record['picking']['target_instance_id'])
++            self.assertEqual(len(record['objects']), 2)
++            self.assertFalse(record['robot_ready'])
++
++
++if __name__ == '__main__':
++    unittest.main()

@@ -1,0 +1,130 @@
+camera:
+  device_id: JEJ-043
+  address: null
+  api_lib_path: null
+  refresh_discovery: true
+  timeout_ms: 30000
+  force_camera_space: true
+  roi_xyxy:
+  - 620
+  - 280
+  - 1420
+  - 1080
+  texture_source: LED
+  led_power: 2048
+  calibration_id: setup-001
+texture:
+  lower_percentile: 1.0
+  upper_percentile: 99.5
+  clahe:
+    enabled: false
+    clip_limit: 1.5
+    tile_grid_size:
+    - 8
+    - 8
+capture:
+  output_dir: data/raw
+  interval_seconds: 2.0
+  save_3d: false
+measurement:
+  min_z_mm: 400.0
+  max_z_mm: 1300.0
+  mask_erode_px: 3
+  min_valid_points: 80
+  nearest_percentile: 5.0
+  trim_percent: 1.0
+  confidence_min: null
+yolo:
+  weights: models/best.pt
+  base_model: yolo11n-seg.pt
+  image_size: 1024
+  confidence: 0.25
+  iou: 0.6
+  device: null
+training:
+  epochs: 150
+  batch: 4
+  workers: 4
+  patience: 30
+  seed: 42
+  output_dir: runs/segment
+  run_name: phoxi_objects
+dataset:
+  raw_images: data/raw/images
+  raw_labels: data/raw/labels
+  auto_labels: data/raw/auto_labels
+  prepared_dir: data/dataset
+  train_ratio: 0.7
+  val_ratio: 0.2
+  test_ratio: 0.1
+  seed: 42
+runtime:
+  output_dir: results
+  save_annotated: false
+  save_jsonl: true
+  scan_mode: manual
+  interval_seconds: 2.0
+  trigger_host: 127.0.0.1
+  trigger_port: 8765
+  mask_fill: true
+  mask_alpha: 0.22
+  debug_rejected: false
+postprocess:
+  roi:
+    enabled: true
+    path: '@config/reference/bin_roi.json'
+  surface:
+    height_mode: plane
+    require_reference_identity: true
+    min_valid_points: 30
+    mask_erode_px: 1
+    path: '@config/reference/bin_surface.npz'
+    floor_roi_path: '@config/reference/bin_floor_roi.json'
+  duplicates:
+    enabled: true
+    mask_iou: 0.45
+    containment: 0.8
+picking:
+  enabled: true
+  max_candidates: 3
+  min_valid_ratio: 0.5
+  min_points: 80
+  require_plane: true
+  require_roi: true
+  require_reference_identity: true
+  max_frame_age_ms: 5000
+  neighbor_jump_mm: 6.0
+  min_component_ratio: 0.7
+  core_fraction: 0.8
+  normal_radius_mm: 10.0
+  min_normal_points: 20
+  normal_inlier_deg: 20.0
+  max_normal_rms_mm: 1.5
+  max_tilt_deg: 25.0
+  plane_face_mm: 2.0
+  max_geometry_points: 12000
+  normal_map_enabled: true
+  opening_gap_mm: 2.0
+  width_uncertainty_mm: 3.0
+  max_object_width_mm: 75.0
+  max_opening_mm: 85.0
+  class_shapes:
+    hop_anibox: box
+    khoi_lap_phuong: cube
+    khoi_tru: cylinder
+    lo_nhua_nap_xanh: cylinder
+    lo_nhua_nap_do: cylinder
+  clearance:
+    enabled: true
+    geometry_verified: false
+    finger_thickness_mm: null
+    finger_span_mm: null
+    finger_length_mm: null
+    palm_span_mm: null
+    palm_width_mm: null
+    palm_depth_mm: null
+    insertion_depth_mm: null
+    approach_mm: 50.0
+    vertical_motion_envelope_mm: null
+    safety_margin_mm: 2.0
+    projection_max_error_px: 0.5

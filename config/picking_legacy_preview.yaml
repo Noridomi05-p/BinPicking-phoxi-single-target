@@ -1,0 +1,10 @@
+# CHI de danh gia offline inspection cu chua luu identity / mat phang day.
+# De xuat camera; khong phai du lieu dieu khien robot.
+postprocess:
+  surface:
+    height_mode: camera_z
+    require_reference_identity: false
+picking:
+  enabled: true
+  require_plane: false
+  require_reference_identity: false

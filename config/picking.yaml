@@ -1,0 +1,41 @@
+yolo:
+  weights: models/best.pt
+  base_model: yolo11n-seg.pt
+  image_size: 1024
+  confidence: 0.25
+  iou: 0.6
+  device: null
+postprocess:
+  surface:
+    height_mode: plane
+    require_reference_identity: true
+picking:
+  enabled: true
+runtime:
+  scan_mode: manual
+  debug_rejected: false
+camera:
+  device_id: JEJ-043
+  address: null
+  api_lib_path: null
+  refresh_discovery: true
+  timeout_ms: 30000
+  force_camera_space: true
+  roi_xyxy:
+  - 620
+  - 280
+  - 1420
+  - 1080
+  texture_source: LED
+  led_power: 1048
+texture:
+  lower_percentile: 1.0
+  upper_percentile: 99.5
+measurement:
+  min_z_mm: 400.0
+  max_z_mm: 1300.0
+  mask_erode_px: 3
+  min_valid_points: 80
+  nearest_percentile: 5.0
+  trim_percent: 1.0
+  confidence_min: null
