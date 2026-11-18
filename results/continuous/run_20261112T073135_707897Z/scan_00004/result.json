@@ -1,0 +1,510 @@
+{
+  "frame_id": 3,
+  "timestamp_utc": "2026-11-12T07:34:02.157207+00:00",
+  "captured_at_utc": "2026-11-12T07:33:58.720110+00:00",
+  "picking": {
+    "enabled": true,
+    "status": "PREVIEW_UNVALIDATED",
+    "target_instance_id": 0,
+    "pose": {
+      "surface_anchor_xyz_mm": [
+        69.4980239868164,
+        -64.30877685546875,
+        894.2601928710938
+      ],
+      "surface_anchor_uv": [
+        561,
+        291
+      ],
+      "surface_normal_camera": [
+        -0.2141522466489015,
+        0.045995252902700075,
+        -0.9757167888099726
+      ],
+      "rotation_camera": [
+        [
+          0.7938392172396939,
+          0.5691731831591316,
+          0.21415224664890153
+        ],
+        [
+          -0.5738499639964874,
+          0.8176678149050792,
+          -0.04599525290270008
+        ],
+        [
+          -0.20128466407926002,
+          -0.08637842346821781,
+          0.9757167888099727
+        ]
+      ],
+      "axis_convention": "columns: x=tangent, y=jaw_closing, z=approach",
+      "translation_semantics": "measured surface anchor; NOT robot TCP or GraspNet reference point",
+      "visible_width_mm": 59.91755485656938,
+      "centered_width_bound_mm": 66.47388133529576,
+      "estimated_width_with_margin_mm": 69.47388133529576,
+      "proposed_opening_mm": 75.0,
+      "full_object_width_known": false,
+      "core_radius_px": 49.393798828125,
+      "tilt_deg": 0.7840093850172475,
+      "tilt_reference": "floor_normal",
+      "jaw_angle_plane_deg": 125.5852696592636,
+      "jaw_angle_reference": "floor_plane",
+      "jaw_angle_zero_axis": "camera_x",
+      "jaw_angle_semantics": "jaw axis modulo 180 deg; zero=jaw_angle_zero_axis projected into reference plane, positive toward cross(reference normal, zero); NOT robot Euler angles",
+      "shape_hint": "cylinder",
+      "yaw_ambiguous": true,
+      "cylinder_contact_mode": "UNVERIFIED",
+      "component_count": 64,
+      "retained_ratio": 0.9146020031628888,
+      "discarded_for_geometry": 1944,
+      "discarded_points_still_used_for_collision": true,
+      "normal_source": "NormalMap_checked_against_local_plane",
+      "local_plane_rms_mm": 0.1485271358032767,
+      "local_normal_points": 2104,
+      "robot_ready": false,
+      "required_opening_mm": 73.47388133529576,
+      "clearance": {
+        "status": "UNKNOWN",
+        "reason": "GRIPPER_GEOMETRY_UNCONFIGURED",
+        "missing": [
+          "finger_thickness_mm",
+          "finger_span_mm",
+          "finger_length_mm",
+          "palm_span_mm",
+          "palm_width_mm",
+          "palm_depth_mm",
+          "insertion_depth_mm",
+          "vertical_motion_envelope_mm"
+        ],
+        "model": "configured_open_gripper_swept_boxes",
+        "closing_status": "NOT_VERIFIED_LINKAGE_AND_CONTACT",
+        "retreat_status": "NOT_VERIFIED_HELD_OBJECT",
+        "arm_status": "NOT_VERIFIED",
+        "robot_ready": false
+      }
+    },
+    "ranking": [
+      {
+        "instance_id": 0,
+        "class_name": "lo_nhua_nap_do",
+        "pick_score": 0.7873374801615796,
+        "height_percentile_mm": 151.3390068816205,
+        "height_mode": "plane",
+        "valid_ratio": 0.7666969788824897,
+        "eligible": true,
+        "reasons": [],
+        "full_object_integrity": "UNVERIFIED"
+      }
+    ],
+    "attempts": [
+      {
+        "instance_id": 0,
+        "pick_score": 0.7873374801615796,
+        "poses": [
+          {
+            "surface_anchor_xyz_mm": [
+              69.4980239868164,
+              -64.30877685546875,
+              894.2601928710938
+            ],
+            "surface_anchor_uv": [
+              561,
+              291
+            ],
+            "surface_normal_camera": [
+              -0.2141522466489015,
+              0.045995252902700075,
+              -0.9757167888099726
+            ],
+            "rotation_camera": [
+              [
+                0.7938392172396939,
+                0.5691731831591316,
+                0.21415224664890153
+              ],
+              [
+                -0.5738499639964874,
+                0.8176678149050792,
+                -0.04599525290270008
+              ],
+              [
+                -0.20128466407926002,
+                -0.08637842346821781,
+                0.9757167888099727
+              ]
+            ],
+            "axis_convention": "columns: x=tangent, y=jaw_closing, z=approach",
+            "translation_semantics": "measured surface anchor; NOT robot TCP or GraspNet reference point",
+            "visible_width_mm": 59.91755485656938,
+            "centered_width_bound_mm": 66.47388133529576,
+            "estimated_width_with_margin_mm": 69.47388133529576,
+            "proposed_opening_mm": 75.0,
+            "full_object_width_known": false,
+            "core_radius_px": 49.393798828125,
+            "tilt_deg": 0.7840093850172475,
+            "tilt_reference": "floor_normal",
+            "jaw_angle_plane_deg": 125.5852696592636,
+            "jaw_angle_reference": "floor_plane",
+            "jaw_angle_zero_axis": "camera_x",
+            "jaw_angle_semantics": "jaw axis modulo 180 deg; zero=jaw_angle_zero_axis projected into reference plane, positive toward cross(reference normal, zero); NOT robot Euler angles",
+            "shape_hint": "cylinder",
+            "yaw_ambiguous": true,
+            "cylinder_contact_mode": "UNVERIFIED",
+            "component_count": 64,
+            "retained_ratio": 0.9146020031628888,
+            "discarded_for_geometry": 1944,
+            "discarded_points_still_used_for_collision": true,
+            "normal_source": "NormalMap_checked_against_local_plane",
+            "local_plane_rms_mm": 0.1485271358032767,
+            "local_normal_points": 2104,
+            "robot_ready": false,
+            "required_opening_mm": 73.47388133529576,
+            "clearance": {
+              "status": "UNKNOWN",
+              "reason": "GRIPPER_GEOMETRY_UNCONFIGURED",
+              "missing": [
+                "finger_thickness_mm",
+                "finger_span_mm",
+                "finger_length_mm",
+                "palm_span_mm",
+                "palm_width_mm",
+                "palm_depth_mm",
+                "insertion_depth_mm",
+                "vertical_motion_envelope_mm"
+              ],
+              "model": "configured_open_gripper_swept_boxes",
+              "closing_status": "NOT_VERIFIED_LINKAGE_AND_CONTACT",
+              "retreat_status": "NOT_VERIFIED_HELD_OBJECT",
+              "arm_status": "NOT_VERIFIED",
+              "robot_ready": false
+            }
+          }
+        ]
+      }
+    ],
+    "robot_ready": false,
+    "coordinate_space": "camera",
+    "distance_unit": "millimetre",
+    "backend": "deterministic_surface_geometry",
+    "automatic_mask_merge": false,
+    "freshness": {
+      "evaluated_at_utc": "2026-11-12T07:34:02.334867+00:00",
+      "captured_at_utc": "2026-11-12T07:33:58.720110+00:00",
+      "valid_until_utc": "2026-11-12T07:34:18.720110+00:00",
+      "age_ms": 3614.757,
+      "status": "FRESH"
+    },
+    "reference": {
+      "identity_status": "MATCH",
+      "floor_plane_available": true,
+      "identity_differences": {},
+      "identity_details": {
+        "status": "MATCH",
+        "differences": {},
+        "saved_identity": {
+          "shape_hw": [
+            800,
+            800
+          ],
+          "device_id": "JEJ-043",
+          "coordinate_space": "CameraSpace/PrimaryCamera",
+          "roi_xyxy": [
+            620,
+            280,
+            1420,
+            1080
+          ],
+          "source_shape_hw": [
+            1544,
+            2064
+          ],
+          "calibration_id": "setup-001",
+          "texture_source": "LED",
+          "led_power": 2048
+        },
+        "frame_identity": {
+          "shape_hw": [
+            800,
+            800
+          ],
+          "device_id": "JEJ-043",
+          "coordinate_space": "CameraSpace/PrimaryCamera",
+          "roi_xyxy": [
+            620,
+            280,
+            1420,
+            1080
+          ],
+          "source_shape_hw": [
+            1544,
+            2064
+          ],
+          "calibration_id": "setup-001",
+          "texture_source": "LED",
+          "led_power": 2048
+        },
+        "reference_path": "/home/noridomi-05/phoxi-single-target/data/calibration/bin_surface.npz",
+        "run_live_capture_settings": {
+          "texture_source": "LED",
+          "led_power": 1048
+        }
+      }
+    },
+    "timings_ms": {
+      "rank": 0.0813470005596173,
+      "geometry_and_clearance": 33.412357999623055,
+      "total": 33.49400200022501
+    },
+    "tcp_preview": {
+      "status": "TCP_PREVIEW_UNVALIDATED",
+      "robot_ready": false,
+      "frame": "BASE",
+      "source_frame_id": 3,
+      "distance_unit": "millimetre",
+      "angle_unit": "degree",
+      "euler": "intrinsic_ZYZ",
+      "tcp_name": "2F 85",
+      "tcp_flange_xyzabc": [
+        0.809,
+        0.369,
+        185.271,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tcp_xyzabc": [
+        -375.73545703211244,
+        374.3963604793638,
+        114.30303974034948,
+        160.59393181082498,
+        178.91559752474527,
+        -146.89432849420902
+      ],
+      "pregrasp_xyzabc": [
+        -374.842953449465,
+        374.08195410209487,
+        164.29408479828854,
+        160.59393181082498,
+        178.91559752474527,
+        -146.89432849420902
+      ],
+      "rotation_base_tcp": [
+        [
+          -0.6084573595600931,
+          0.7933857930030913,
+          -0.01785007165294758
+        ],
+        [
+          0.7934282092359072,
+          0.6086313631753416,
+          0.006288127545378804
+        ],
+        [
+          0.015853024502005993,
+          -0.01033669290349255,
+          -0.9998209011587814
+        ]
+      ],
+      "approach_base": [
+        -0.01785007165294758,
+        0.006288127545378804,
+        -0.9998209011587814
+      ],
+      "surface_anchor_base_mm": [
+        -375.37361822963555,
+        374.2688938458914,
+        134.5704092277391
+      ],
+      "contact_center_base_mm": [
+        -375.4628685879003,
+        374.3003344836183,
+        129.5713047219452
+      ],
+      "tcp_to_contact_tcp_mm": [
+        0.0,
+        0.0,
+        -15.270999999999987
+      ],
+      "grasp_depth_mm": 5.0,
+      "actual_opening_mm": 75.0,
+      "open_position_request": 30,
+      "contact_reference_opening_mm": 75.0,
+      "calibration_sha256": "010588db22adbb4e01c91fd3cc79d9b7593d5237392416e07c12cb4253f893ad",
+      "limitations": [
+        "CONTACT_CENTER_APPROXIMATE_AT_REFERENCE_OPENING",
+        "CLOSING_KINEMATICS_UNVERIFIED",
+        "ARM_AND_RETREAT_NOT_VERIFIED"
+      ],
+      "source_freshness": {
+        "evaluated_at_utc": "2026-11-12T07:34:02.334867+00:00",
+        "captured_at_utc": "2026-11-12T07:33:58.720110+00:00",
+        "valid_until_utc": "2026-11-12T07:34:18.720110+00:00",
+        "age_ms": 3614.757,
+        "status": "FRESH"
+      }
+    }
+  },
+  "objects": [
+    {
+      "instance_id": 0,
+      "class_id": 1,
+      "class_name": "lo_nhua_nap_do",
+      "confidence": 0.46161919832229614,
+      "bbox_xyxy": [
+        439,
+        191,
+        670,
+        416
+      ],
+      "verified_3d": true,
+      "measurement": {
+        "valid": true,
+        "reason": null,
+        "point_count": 20445,
+        "mask_pixel_count": 29691,
+        "valid_ratio": 0.7026708430164023,
+        "center_xyz_mm": [
+          68.70249938964844,
+          -57.87281036376953,
+          894.9746704101562
+        ],
+        "depth_z_median_mm": 894.9746704101562,
+        "depth_z_p10_mm": 890.680419921875,
+        "depth_z_p90_mm": 901.0924682617188,
+        "distance_3d_median_mm": 899.875244140625,
+        "nearest_surface_mm": 896.2451171875,
+        "visible_extent_xyz_mm": [
+          52.790382385253906,
+          60.43099594116211,
+          13.08233642578125
+        ],
+        "confidence_median": 0.18939208984375,
+        "measurement_kind": "full_visible_surface"
+      },
+      "postprocess": {
+        "valid": true,
+        "reason": null,
+        "roi_overlap": 1.0,
+        "roi_center_inside": true,
+        "surface_valid_ratio": 0.6980229699235458,
+        "surface_raised_ratio": 0.9897225572979493,
+        "surface_height_percentile_mm": 151.3390068816205,
+        "surface_height_max_mm": 356.62168905916246,
+        "surface_height_p99_mm": 151.6782194153521,
+        "surface_height_threshold_mm": 5.0,
+        "surface_status": "PASS",
+        "surface_mask_pixels": 29691,
+        "surface_valid_points": 20725,
+        "surface_raised_points": 20512,
+        "surface_raised_ratio_mask": 0.6908490788454413,
+        "duplicate_of_instance_id": null,
+        "duplicate_mask_iou": null,
+        "duplicate_containment": null,
+        "surface_height_mode": "plane",
+        "surface_reference_status": "MATCH"
+      }
+    }
+  ],
+  "rejected": [],
+  "camera_settings": {
+    "source": "config",
+    "values": {
+      "CapturingSettings/LEDPower": 2048,
+      "CapturingSettings/LaserPower": 2048,
+      "CapturingSettings/ShutterMultiplier": 1,
+      "CapturingSettings/TextureSource": "LED"
+    },
+    "read_messages": {},
+    "writes": {
+      "CapturingSettings/TextureSource": "LED",
+      "CapturingSettings/ShutterMultiplier": 1,
+      "CapturingSettings/LaserPower": 2048,
+      "CapturingSettings/LEDPower": 2048
+    },
+    "coordinates": {
+      "verified_by": "device_get_settings",
+      "values": {
+        "CoordinatesSettings/CameraSpace": "PrimaryCamera",
+        "CoordinatesSettings/CoordinateSpace": "CameraSpace"
+      },
+      "set_settings_messages": {
+        "CoordinatesSettings/CameraSpace": "not available"
+      }
+    },
+    "writes_on_open": {}
+  },
+  "acquisition_identity": {
+    "shape_hw": [
+      800,
+      800
+    ],
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "roi_xyxy": [
+      620,
+      280,
+      1420,
+      1080
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "calibration_id": "setup-001",
+    "texture_source": "LED",
+    "led_power": 2048
+  },
+  "reference_identity": {
+    "status": "MATCH",
+    "differences": {},
+    "saved_identity": {
+      "shape_hw": [
+        800,
+        800
+      ],
+      "device_id": "JEJ-043",
+      "coordinate_space": "CameraSpace/PrimaryCamera",
+      "roi_xyxy": [
+        620,
+        280,
+        1420,
+        1080
+      ],
+      "source_shape_hw": [
+        1544,
+        2064
+      ],
+      "calibration_id": "setup-001",
+      "texture_source": "LED",
+      "led_power": 2048
+    },
+    "frame_identity": {
+      "shape_hw": [
+        800,
+        800
+      ],
+      "device_id": "JEJ-043",
+      "coordinate_space": "CameraSpace/PrimaryCamera",
+      "roi_xyxy": [
+        620,
+        280,
+        1420,
+        1080
+      ],
+      "source_shape_hw": [
+        1544,
+        2064
+      ],
+      "calibration_id": "setup-001",
+      "texture_source": "LED",
+      "led_power": 2048
+    },
+    "reference_path": "/home/noridomi-05/phoxi-single-target/data/calibration/bin_surface.npz",
+    "run_live_capture_settings": {
+      "texture_source": "LED",
+      "led_power": 1048
+    }
+  },
+  "robot_ready": false
+}

@@ -1,0 +1,22 @@
+# PhoXi -> Doosan BASE; this file is separate from config/picking.yaml.
+board:
+  # INNER corners. A printed board with 16 x 11 squares has 15 x 10 inner corners.
+  cols: 15
+  rows: 10
+  square_mm: 16.0
+detection:
+  corner_radius_px: 5
+  local_rms_max_mm: 0.5
+  min_3d_fraction: 0.70
+  corner_inlier_mm: 1.2
+  board_rms_max_mm: 1.0
+  square_relative_tolerance: 0.03
+solver:
+  min_fit_samples: 6
+  min_validation_samples: 5
+  min_second_axis_deg: 3.0
+  rotation_weight_mm: 100.0
+  robust_scale_mm: 1.0
+  # Example USER limits, not guaranteed hardware accuracy.
+  max_position_error_mm: 2.0
+  max_rotation_error_deg: 1.0

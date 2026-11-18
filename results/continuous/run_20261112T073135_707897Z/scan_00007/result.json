@@ -1,0 +1,320 @@
+{
+  "frame_id": 6,
+  "timestamp_utc": "2026-11-12T07:35:10.494755+00:00",
+  "captured_at_utc": "2026-11-12T07:35:07.108989+00:00",
+  "picking": {
+    "enabled": true,
+    "status": "NO_TARGET",
+    "target_instance_id": null,
+    "pose": null,
+    "ranking": [
+      {
+        "instance_id": 0,
+        "class_name": "lo_nhua_nap_do",
+        "pick_score": 0.8935017992651597,
+        "height_percentile_mm": 91.37573370654542,
+        "height_mode": "plane",
+        "valid_ratio": 0.8557314352491235,
+        "eligible": true,
+        "reasons": [],
+        "full_object_integrity": "UNVERIFIED"
+      }
+    ],
+    "attempts": [
+      {
+        "instance_id": 0,
+        "pick_score": 0.8935017992651597,
+        "poses": [],
+        "reason": "NO_ORIENTATION_WITHIN_OPENING_LIMIT"
+      }
+    ],
+    "robot_ready": false,
+    "coordinate_space": "camera",
+    "distance_unit": "millimetre",
+    "backend": "deterministic_surface_geometry",
+    "automatic_mask_merge": false,
+    "freshness": {
+      "evaluated_at_utc": "2026-11-12T07:35:10.684751+00:00",
+      "captured_at_utc": "2026-11-12T07:35:07.108989+00:00",
+      "valid_until_utc": "2026-11-12T07:35:27.108989+00:00",
+      "age_ms": 3575.762,
+      "status": "FRESH"
+    },
+    "reference": {
+      "identity_status": "MATCH",
+      "floor_plane_available": true,
+      "identity_differences": {},
+      "identity_details": {
+        "status": "MATCH",
+        "differences": {},
+        "saved_identity": {
+          "shape_hw": [
+            800,
+            800
+          ],
+          "device_id": "JEJ-043",
+          "coordinate_space": "CameraSpace/PrimaryCamera",
+          "roi_xyxy": [
+            620,
+            280,
+            1420,
+            1080
+          ],
+          "source_shape_hw": [
+            1544,
+            2064
+          ],
+          "calibration_id": "setup-001",
+          "texture_source": "LED",
+          "led_power": 2048
+        },
+        "frame_identity": {
+          "shape_hw": [
+            800,
+            800
+          ],
+          "device_id": "JEJ-043",
+          "coordinate_space": "CameraSpace/PrimaryCamera",
+          "roi_xyxy": [
+            620,
+            280,
+            1420,
+            1080
+          ],
+          "source_shape_hw": [
+            1544,
+            2064
+          ],
+          "calibration_id": "setup-001",
+          "texture_source": "LED",
+          "led_power": 2048
+        },
+        "reference_path": "/home/noridomi-05/phoxi-single-target/data/calibration/bin_surface.npz",
+        "run_live_capture_settings": {
+          "texture_source": "LED",
+          "led_power": 1048
+        }
+      }
+    },
+    "timings_ms": {
+      "rank": 0.08380300005228492,
+      "geometry_and_clearance": 33.955195999624266,
+      "total": 34.039342000141914
+    },
+    "tcp_preview": null
+  },
+  "objects": [
+    {
+      "instance_id": 0,
+      "class_id": 1,
+      "class_name": "lo_nhua_nap_do",
+      "confidence": 0.9430379271507263,
+      "bbox_xyxy": [
+        472,
+        191,
+        667,
+        378
+      ],
+      "verified_3d": true,
+      "measurement": {
+        "valid": true,
+        "reason": null,
+        "point_count": 24165,
+        "mask_pixel_count": 28239,
+        "valid_ratio": 0.8557314352491235,
+        "center_xyz_mm": [
+          75.00554656982422,
+          -71.54350280761719,
+          955.1423950195312
+        ],
+        "depth_z_median_mm": 955.1423950195312,
+        "depth_z_p10_mm": 950.1208740234375,
+        "depth_z_p90_mm": 960.2924194335938,
+        "distance_3d_median_mm": 960.7911376953125,
+        "nearest_surface_mm": null,
+        "visible_extent_xyz_mm": null,
+        "confidence_median": null,
+        "measurement_kind": "coarse"
+      },
+      "postprocess": {
+        "valid": true,
+        "reason": null,
+        "roi_overlap": 1.0,
+        "roi_center_inside": true,
+        "surface_valid_ratio": 0.8290661850632105,
+        "surface_raised_ratio": 0.9929523321373654,
+        "surface_height_percentile_mm": 91.37573370654542,
+        "surface_height_max_mm": 225.17426298305554,
+        "surface_height_p99_mm": 91.88582763734281,
+        "surface_height_threshold_mm": 5.0,
+        "surface_status": "PASS",
+        "surface_mask_pixels": 28239,
+        "surface_valid_points": 23412,
+        "surface_raised_points": 23247,
+        "surface_raised_ratio_mask": 0.8232232019547434,
+        "duplicate_of_instance_id": null,
+        "duplicate_mask_iou": null,
+        "duplicate_containment": null,
+        "surface_height_mode": "plane",
+        "surface_reference_status": "MATCH"
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "instance_id": 1,
+      "class_id": 4,
+      "class_name": "hop_anibox",
+      "confidence": 0.343696266412735,
+      "bbox_xyxy": [
+        609,
+        361,
+        681,
+        506
+      ],
+      "verified_3d": false,
+      "measurement": {
+        "valid": true,
+        "reason": null,
+        "point_count": 3579,
+        "mask_pixel_count": 3684,
+        "valid_ratio": 0.9714983713355049,
+        "center_xyz_mm": [
+          116.7384262084961,
+          -11.814220428466797,
+          1041.0396728515625
+        ],
+        "depth_z_median_mm": 1041.0396728515625,
+        "depth_z_p10_mm": 1038.176953125,
+        "depth_z_p90_mm": 1043.6983642578125,
+        "distance_3d_median_mm": 1047.7247314453125,
+        "nearest_surface_mm": null,
+        "visible_extent_xyz_mm": null,
+        "confidence_median": null,
+        "measurement_kind": "coarse"
+      },
+      "postprocess": {
+        "valid": false,
+        "reason": "NEAR_BIN_SURFACE",
+        "roi_overlap": 1.0,
+        "roi_center_inside": true,
+        "surface_valid_ratio": 0.6115635179153095,
+        "surface_raised_ratio": 0.004438526409232135,
+        "surface_height_percentile_mm": 0.47433480866179706,
+        "surface_height_max_mm": 343.64651036971,
+        "surface_height_p99_mm": 0.6585880021124831,
+        "surface_height_threshold_mm": 5.0,
+        "surface_status": "REJECT",
+        "surface_mask_pixels": 3684,
+        "surface_valid_points": 2253,
+        "surface_raised_points": 10,
+        "surface_raised_ratio_mask": 0.0027144408251900108,
+        "duplicate_of_instance_id": null,
+        "duplicate_mask_iou": null,
+        "duplicate_containment": null,
+        "surface_height_mode": "plane",
+        "surface_reference_status": "MATCH"
+      }
+    }
+  ],
+  "camera_settings": {
+    "source": "config",
+    "values": {
+      "CapturingSettings/LEDPower": 2048,
+      "CapturingSettings/LaserPower": 2048,
+      "CapturingSettings/ShutterMultiplier": 1,
+      "CapturingSettings/TextureSource": "LED"
+    },
+    "read_messages": {},
+    "writes": {
+      "CapturingSettings/TextureSource": "LED",
+      "CapturingSettings/ShutterMultiplier": 1,
+      "CapturingSettings/LaserPower": 2048,
+      "CapturingSettings/LEDPower": 2048
+    },
+    "coordinates": {
+      "verified_by": "device_get_settings",
+      "values": {
+        "CoordinatesSettings/CameraSpace": "PrimaryCamera",
+        "CoordinatesSettings/CoordinateSpace": "CameraSpace"
+      },
+      "set_settings_messages": {
+        "CoordinatesSettings/CameraSpace": "not available"
+      }
+    },
+    "writes_on_open": {}
+  },
+  "acquisition_identity": {
+    "shape_hw": [
+      800,
+      800
+    ],
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "roi_xyxy": [
+      620,
+      280,
+      1420,
+      1080
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "calibration_id": "setup-001",
+    "texture_source": "LED",
+    "led_power": 2048
+  },
+  "reference_identity": {
+    "status": "MATCH",
+    "differences": {},
+    "saved_identity": {
+      "shape_hw": [
+        800,
+        800
+      ],
+      "device_id": "JEJ-043",
+      "coordinate_space": "CameraSpace/PrimaryCamera",
+      "roi_xyxy": [
+        620,
+        280,
+        1420,
+        1080
+      ],
+      "source_shape_hw": [
+        1544,
+        2064
+      ],
+      "calibration_id": "setup-001",
+      "texture_source": "LED",
+      "led_power": 2048
+    },
+    "frame_identity": {
+      "shape_hw": [
+        800,
+        800
+      ],
+      "device_id": "JEJ-043",
+      "coordinate_space": "CameraSpace/PrimaryCamera",
+      "roi_xyxy": [
+        620,
+        280,
+        1420,
+        1080
+      ],
+      "source_shape_hw": [
+        1544,
+        2064
+      ],
+      "calibration_id": "setup-001",
+      "texture_source": "LED",
+      "led_power": 2048
+    },
+    "reference_path": "/home/noridomi-05/phoxi-single-target/data/calibration/bin_surface.npz",
+    "run_live_capture_settings": {
+      "texture_source": "LED",
+      "led_power": 1048
+    }
+  },
+  "robot_ready": false
+}

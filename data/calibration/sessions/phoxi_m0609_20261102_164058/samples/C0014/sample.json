@@ -1,0 +1,102 @@
+{
+  "id": "C0014",
+  "role": "fit",
+  "enabled": true,
+  "captured_at_utc": "2026-11-02T10:07:18.103090+00:00",
+  "confirmed_at_utc": "2026-11-02T10:08:35.206449+00:00",
+  "frame_id": 19,
+  "robot_pose_xyzabc": [
+    -139.91,
+    323.13,
+    191.24,
+    121.87,
+    167.82,
+    -155.16
+  ],
+  "T_base_flange": [
+    [
+      -0.11160325280804304,
+      0.9874893391238896,
+      -0.11139802098479051,
+      -139.91
+    ],
+    [
+      0.9751339003473946,
+      0.1304197667113476,
+      0.17917745629468948,
+      323.13
+    ],
+    [
+      0.1914643318112847,
+      -0.08863119974152137,
+      -0.9774896010068019,
+      191.24
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_camera_board": [
+    [
+      -0.9084053503273253,
+      -0.15075761355683487,
+      0.3899639232689834,
+      256.86961999006724
+    ],
+    [
+      0.10955940259559091,
+      -0.9859676249705555,
+      -0.12595467364421126,
+      197.56594859468234
+    ],
+    [
+      0.4034804292646505,
+      -0.07169368496995093,
+      0.9121751798508021,
+      938.4504648714552
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "rms_mm": 0.6277787124709501,
+  "max_error_mm": 1.024288650128136,
+  "measured_square_mm": 20.20727392794857,
+  "valid_corners": 46,
+  "inlier_corners": 44,
+  "total_corners": 63,
+  "origin_flipped_180": false,
+  "method": "organized_xyz_local_affine_then_rigid_3d",
+  "stationary_confirmed": true,
+  "origin_confirmed": true,
+  "camera_identity": {
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "image_shape_hw": [
+      1544,
+      2064
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "roi_xyxy": null,
+    "calibration_id": "setup-001"
+  },
+  "board": {
+    "type": "checkerboard",
+    "counts": "inner_corners",
+    "cols": 7,
+    "rows": 9,
+    "square_mm": 20.0,
+    "origin": "physically_marked_first_inner_corner",
+    "axes": "x=columns,y=rows,z=x_cross_y"
+  },
+  "demo": false
+}

@@ -1,0 +1,229 @@
+{
+  "stem": "frame",
+  "frame_id": 34,
+  "timestamp_utc": "2026-11-04T13:10:33.672800+00:00",
+  "coordinate_space": "camera",
+  "distance_unit": "millimetre",
+  "frame_info": {
+    "BalanceRgb": {
+      "x": 1.0,
+      "y": 1.0,
+      "z": 1.0
+    },
+    "CameraBinning": {
+      "h": 1,
+      "w": 1
+    },
+    "CameraBinningFactor": {
+      "h": 1.0,
+      "w": 1.0
+    },
+    "CameraMatrix": [
+      2332.5272913749664,
+      0.0,
+      1000.141116276311,
+      0.0,
+      2333.71441695965,
+      738.435600661624,
+      0.0,
+      0.0,
+      1.0
+    ],
+    "CurrentCamera": {
+      "OrthogonalSettings": {
+        "height": 0.0,
+        "width": 0.0
+      },
+      "PerspectiveSettings": {
+        "CameraMatrix": [
+          2332.5272913749664,
+          0.0,
+          1000.141116276311,
+          0.0,
+          2333.71441695965,
+          738.435600661624,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "DistortionCoefficients": [
+          -0.23109336854139578,
+          0.15186170811985006,
+          -0.0004935190586136347,
+          0.0007052164454516404,
+          -0.0634419448638188,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "ProjectionMode": "Perspective",
+      "Resolution": {
+        "height": 1544,
+        "width": 2064
+      },
+      "WorldToCameraCoordinates": [
+        1.0,
+        0.0,
+        0.0,
+        -0.0,
+        0.0,
+        1.0,
+        0.0,
+        -0.0,
+        0.0,
+        0.0,
+        1.0,
+        -0.0
+      ]
+    },
+    "CurrentCameraPosition": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "CurrentCameraXAxis": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "CurrentCameraYAxis": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "CurrentCameraZAxis": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 1.0
+    },
+    "DistortionCoefficients": [
+      -0.23109336854139578,
+      0.15186170811985006,
+      -0.0004935190586136347,
+      0.0007052164454516404,
+      -0.0634419448638188,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "Duration": 1822.4024640005082,
+    "DurationComputation": 271.1168959975039,
+    "DurationTransfer": 753.922596002667,
+    "HwId": "JEJ-043",
+    "Index": 34,
+    "SensorPosition": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "SensorXAxis": {
+      "x": 1.0,
+      "y": 0.0,
+      "z": 0.0
+    },
+    "SensorYAxis": {
+      "x": 0.0,
+      "y": 1.0,
+      "z": 0.0
+    },
+    "SensorZAxis": {
+      "x": 0.0,
+      "y": 0.0,
+      "z": 1.0
+    },
+    "Temperature": [
+      46.1,
+      34.44,
+      36.81,
+      -273.15,
+      -273.15,
+      -273.15,
+      -273.15,
+      -273.15,
+      -273.15
+    ],
+    "Timestamp": 2532356.7815040005,
+    "TotalScanCount": 29945,
+    "capture_started_utc": "2026-11-04T13:10:30.298314+00:00",
+    "acquisition": {
+      "device_id": "JEJ-043",
+      "coordinate_space": "CameraSpace/PrimaryCamera",
+      "roi_xyxy": [
+        620,
+        280,
+        1420,
+        1080
+      ],
+      "source_shape_hw": [
+        1544,
+        2064
+      ],
+      "calibration_id": "setup-001",
+      "texture_source": "LED",
+      "led_power": 1048
+    },
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "roi_xyxy": [
+      620,
+      280,
+      1420,
+      1080
+    ],
+    "texture_recipe": {
+      "lower_percentile": 1.0,
+      "upper_percentile": 99.5,
+      "clahe": {
+        "enabled": false,
+        "clip_limit": 1.5,
+        "tile_grid_size": [
+          8,
+          8
+        ]
+      }
+    }
+  },
+  "statistics": {
+    "image_shape": [
+      800,
+      800,
+      3
+    ],
+    "point_cloud_shape": [
+      800,
+      800,
+      3
+    ],
+    "valid_3d_points": 548278,
+    "valid_3d_ratio": 0.856684375,
+    "z_mm_percentiles": {
+      "1": 715.4492797851562,
+      "5": 930.5543823242188,
+      "50": 1046.0384521484375,
+      "95": 1093.52392578125,
+      "99": 1138.8387451171875
+    },
+    "confidence_percentiles": {
+      "1": 0.0,
+      "5": 0.0439453125,
+      "50": 0.080322265625,
+      "95": 1.3428955078125,
+      "99": 3.91802978515625
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "id": "C0016",
+  "role": "fit",
+  "enabled": true,
+  "captured_at_utc": "2026-11-02T10:12:20.490755+00:00",
+  "confirmed_at_utc": "2026-11-02T10:13:09.360517+00:00",
+  "frame_id": 27,
+  "robot_pose_xyzabc": [
+    -309.82,
+    146.19,
+    309.68,
+    10.37,
+    -167.82,
+    24.82
+  ],
+  "T_base_flange": [
+    [
+      -0.9482683585049141,
+      0.24024021854774122,
+      -0.20753736446849516,
+      -309.82
+    ],
+    [
+      0.25321272937607864,
+      0.9666648806121396,
+      -0.037977918229336466,
+      146.19
+    ],
+    [
+      0.191495258271092,
+      -0.08856436068335241,
+      -0.9774896010068017,
+      309.68
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_camera_board": [
+    [
+      -0.19651432939182398,
+      -0.9633975800571128,
+      0.18233820522255167,
+      -53.09845285066683
+    ],
+    [
+      0.9415005303943667,
+      -0.2373332118270253,
+      -0.23926909083915485,
+      -214.82575000222016
+    ],
+    [
+      0.27378617498115065,
+      0.12465171199774132,
+      0.9536787095690166,
+      871.5830618966039
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "rms_mm": 0.8010936373806528,
+  "max_error_mm": 1.217708689876923,
+  "measured_square_mm": 20.265210909473442,
+  "valid_corners": 61,
+  "inlier_corners": 50,
+  "total_corners": 63,
+  "origin_flipped_180": false,
+  "method": "organized_xyz_local_affine_then_rigid_3d",
+  "stationary_confirmed": true,
+  "origin_confirmed": true,
+  "camera_identity": {
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "image_shape_hw": [
+      1544,
+      2064
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "roi_xyxy": null,
+    "calibration_id": "setup-001"
+  },
+  "board": {
+    "type": "checkerboard",
+    "counts": "inner_corners",
+    "cols": 7,
+    "rows": 9,
+    "square_mm": 20.0,
+    "origin": "physically_marked_first_inner_corner",
+    "axes": "x=columns,y=rows,z=x_cross_y"
+  },
+  "demo": false
+}

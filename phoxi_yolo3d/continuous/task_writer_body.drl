@@ -1,0 +1,305 @@
+# Definitions for the Custom Code BEFORE MainSub. No motion during initialization.
+PX_SOCKET = None
+PX_RX_BUFFER = b""
+PX_SESSION = ""
+PX_SEQUENCE = 0
+PX_STOPPED = False
+PX_HOLDING = False
+PX_JOB = ""
+PX_PHASE = "INITIALIZED"
+
+def px_send(text):
+    if client_socket_write(PX_SOCKET, (text+"\n").encode()) != 0:
+        raise Exception("CONT_SOCKET_WRITE_FAILED")
+
+def px_line(timeout=120):
+    global PX_RX_BUFFER
+    while True:
+        if b"\n" in PX_RX_BUFFER:
+            line, separator, tail = PX_RX_BUFFER.partition(b"\n")
+            PX_RX_BUFFER = tail
+            if len(line) > 4096:
+                raise Exception("CONT_MESSAGE_TOO_LONG")
+            return line.decode().strip()
+        if len(PX_RX_BUFFER) > 4096:
+            raise Exception("CONT_MESSAGE_TOO_LONG")
+        # -1 reads currently received data, avoiding one SDK call for every byte.
+        # Keep the tail: TCP may split a line or combine several lines in one read.
+        res, chunk = client_socket_read(PX_SOCKET, length=-1, timeout=timeout)
+        if res <= 0:
+            raise Exception("CONT_SOCKET_READ_FAILED_"+str(res))
+        if res != len(chunk):
+            raise Exception("CONT_SOCKET_LENGTH_MISMATCH")
+        PX_RX_BUFFER += chunk
+
+def px_disconnect():
+    global PX_SOCKET, PX_RX_BUFFER
+    try:
+        if PX_SOCKET is not None:
+            client_socket_close(PX_SOCKET)
+    finally:
+        PX_SOCKET = None
+        PX_RX_BUFFER = b""
+
+def px_gripper_state():
+    g = PX_CONTRACT["gripper"]
+    words = [int(get_modbus_input(g["status_signal"])),
+             int(get_modbus_input(g["fault_echo_signal"])),
+             int(get_modbus_input(g["position_current_signal"]))]
+    if min(words) < 0 or max(words) > 65535:
+        raise Exception("CONT_INVALID_MODBUS_WORD")
+    status = (words[0] >> 8) & 255
+    value = {"act": status & 1, "gto": (status >> 3) & 1,
+             "sta": (status >> 4) & 3, "obj": (status >> 6) & 3,
+             "fault": (words[1] >> 8) & 255, "echo": words[1] & 255,
+             "pos": (words[2] >> 8) & 255, "current": words[2] & 255}
+    if value["fault"] != 0:
+        tp_log("CONT_GRIPPER_WORDS="+str(words))
+        raise Exception("CONT_GRIPPER_FAULT_"+str(value["fault"]))
+    if value["act"] != 1 or value["sta"] != 3 or value["gto"] != 1:
+        tp_log("CONT_GRIPPER_WORDS="+str(words))
+        raise Exception("CONT_GRIPPER_NOT_ACTIVATED_OR_REGISTER_MAPPING_WRONG")
+    return value
+
+def px_require_hold():
+    state = px_gripper_state()
+    g = PX_CONTRACT["gripper"]
+    if state["obj"] != 2 or state["echo"] != g["close_pr"]:
+        raise Exception("CONT_OBJECT_HOLD_NOT_CONFIRMED")
+    if state["pos"] <= g["open_pr"]+1:
+        raise Exception("CONT_CONTACT_WITHOUT_CLOSING")
+
+def px_gripper(position, closing):
+    global PX_HOLDING
+    g = PX_CONTRACT["gripper"]
+    px_gripper_state()
+    set_modbus_output("2F_SP_FO_1", g["speed_force_word"])
+    set_modbus_output("2F_PR_1", position)
+    good, blocked, empty = 0, 0, 0
+    for index in range(int(g["timeout_seconds"]/g["poll_seconds"])):
+        wait(g["poll_seconds"])
+        state = px_gripper_state()
+        accepted = False
+        if state["echo"] == position:
+            if closing:
+                accepted = state["obj"] == 2 and state["pos"] > g["open_pr"]+1
+                at_request = state["obj"] == 3 and abs(state["pos"]-position) <= g["position_tolerance_raw"]
+                empty = empty+1 if at_request else 0
+            else:
+                accepted = state["obj"] == 3 and abs(state["pos"]-position) <= g["position_tolerance_raw"]
+                blocked = blocked+1 if state["obj"] == 1 else 0
+        else:
+            empty, blocked = 0, 0
+        good = good+1 if accepted else 0
+        if empty >= 3:
+            raise Exception("CONT_NO_GRIP_CONTACT_CHECK_CLOSE_PR_AND_OBJECT_WIDTH")
+        if blocked >= 3:
+            raise Exception("CONT_GRIPPER_OPENING_BLOCKED")
+        if good >= 3:
+            PX_HOLDING = closing
+            tp_log("CONT_GRIPPER="+str(state))
+            return
+    raise Exception("CONT_GRIPPER_TIMEOUT_OR_POSITION_NOT_REACHED")
+
+def px_check_tcp(pose):
+    flange = get_current_tool_flange_posx(DR_BASE)
+    rf = eul2rotm([flange[3], flange[4], flange[5]])
+    rt = eul2rotm([pose[3], pose[4], pose[5]])
+    offset = [sum([rf[j][i]*(pose[j]-flange[j]) for j in range(3)]) for i in range(3)]
+    tcp = PX_CONTRACT["tcp"]
+    if sum([(offset[i]-tcp[i])**2 for i in range(3)]) > 0.25:
+        raise Exception("CONT_TCP_OFFSET_MISMATCH")
+    relative = [[sum([rf[k][i]*rt[k][j] for k in range(3)]) for j in range(3)] for i in range(3)]
+    expected = eul2rotm([tcp[3], tcp[4], tcp[5]])
+    if sum([relative[i][j]*expected[i][j] for i in range(3) for j in range(3)]) < 2.999695:
+        raise Exception("CONT_TCP_ROTATION_MISMATCH")
+
+def px_check_pose(expected):
+    pose, solution = get_current_posx(DR_BASE)
+    px_check_tcp(pose)
+    if solution != 2:
+        raise Exception("CONT_SOLUTION_SPACE_CHANGED")
+    if sum([(pose[i]-expected[i])**2 for i in range(3)]) > 4:
+        raise Exception("CONT_POSITION_CHANGED_OR_NOT_REACHED")
+    ra = eul2rotm([pose[3], pose[4], pose[5]])
+    rb = eul2rotm([expected[3], expected[4], expected[5]])
+    if sum([ra[i][j]*rb[i][j] for i in range(3) for j in range(3)]) < 2.999695:
+        raise Exception("CONT_ORIENTATION_CHANGED_OR_NOT_REACHED")
+
+def px_check_at(name):
+    point = PX_CONTRACT["points"][name]
+    px_check_pose(point["pose"])
+    joints = get_current_posj()
+    for i in range(6):
+        if abs(joints[i]-point["joints"][i]) > 2:
+            raise Exception("CONT_JOINT_CONFIGURATION_CHANGED_AT_"+name)
+
+def px_prefix():
+    return PX_SESSION+"|"+str(PX_SEQUENCE)+"|"+PX_JOB
+
+def px_gate(name):
+    global PX_PHASE
+    PX_PHASE = name
+    pose, solution = get_current_posx(DR_BASE)
+    px_check_pose(pose)
+    if PX_HOLDING:
+        px_require_hold()
+    px_send("CHECK_CONT_V1|"+px_prefix()+"|"+name)
+    if px_line(15) != "PERMIT_CONT_V1|"+px_prefix()+"|"+name:
+        raise Exception("CONT_NO_MATCHING_MOTION_PERMIT")
+    px_check_pose(pose)
+    if PX_HOLDING:
+        px_require_hold()
+
+def px_reached(name):
+    tp_log("CONT_REACHED="+name)
+    px_send("REACHED_CONT_V1|"+px_prefix()+"|"+name)
+
+def px_move(name, target, approach=False, fixed_name=""):
+    px_gate(name)
+    m = PX_CONTRACT["motion"]
+    vel = m["approach_velocity"] if approach else m["travel_velocity"]
+    acc = m["approach_acceleration"] if approach else m["travel_acceleration"]
+    movel(posx(target[0], target[1], target[2], target[3], target[4], target[5]), vel=vel, acc=acc, ref=DR_BASE, mod=DR_MV_MOD_ABS, radius=0)
+    px_check_pose(target)
+    if fixed_name:
+        px_check_at(fixed_name)
+    if PX_HOLDING:
+        px_require_hold()
+    px_reached(name)
+
+def px_check_job(values):
+    if len(values) != 18:
+        raise Exception("CONT_WRONG_POSE_COUNT")
+    for v in values:
+        if not (-1000000 < v < 1000000):
+            raise Exception("CONT_NONFINITE_POSE")
+    pre, grasp, lift = values[0:6], values[6:12], values[12:18]
+    for p in [pre, grasp, lift]:
+        if max([abs(p[i]) for i in range(3)]) > 2000:
+            raise Exception("CONT_POSITION_OUTSIDE_SANITY_LIMIT")
+    if not (grasp[2] < pre[2] and pre[2] < lift[2]):
+        raise Exception("CONT_INVALID_HEIGHT_ORDER")
+    if abs(lift[2]-PX_CONTRACT["motion"]["transfer_tcp_z_mm"]) > 0.001:
+        raise Exception("CONT_WRONG_TRANSFER_HEIGHT")
+    if max([abs(pre[i]-lift[i]) for i in [0,1,3,4,5]]) > 0.001:
+        raise Exception("CONT_LIFT_MUST_KEEP_XY_ABC")
+    rp = eul2rotm([pre[3], pre[4], pre[5]])
+    rg = eul2rotm([grasp[3], grasp[4], grasp[5]])
+    if sum([rp[i][j]*rg[i][j] for i in range(3) for j in range(3)]) < 2.999999:
+        raise Exception("CONT_PREGRASP_GRASP_ROTATION_MISMATCH")
+    delta = [grasp[i]-pre[i] for i in range(3)]
+    length = sum([v*v for v in delta])**0.5
+    if not (1 <= length <= PX_CONTRACT["motion"]["max_descent_mm"]):
+        raise Exception("CONT_INVALID_DESCENT_DISTANCE")
+    if max([abs(delta[i]-length*rp[i][2]) for i in range(3)]) > 0.002:
+        raise Exception("CONT_DESCENT_NOT_ALONG_TCP_Z")
+    if -rp[2][2] < PX_MIN_DOWN_COS:
+        raise Exception("CONT_APPROACH_TILT_OUTSIDE_LIMIT")
+
+def phoxi_run_once():
+    global PX_SOCKET, PX_SESSION, PX_SEQUENCE, PX_STOPPED, PX_JOB, PX_PHASE
+    if PX_STOPPED:
+        return
+    try:
+        if PX_SOCKET is None:
+            PX_SOCKET = client_socket_open(PX_PC_IP, PX_PC_PORT)
+            px_send("HELLO_CONT_V1|"+PX_CONTRACT_ID+"|"+PX_CONTRACT["tcp_name"])
+            welcome = px_line(15).split("|")
+            if len(welcome) != 2 or welcome[0] != "WELCOME_CONT_V1" or len(welcome[1]) != 32:
+                raise Exception("CONT_WRONG_WELCOME")
+            PX_SESSION = welcome[1]
+            if set_tcp(PX_CONTRACT["tcp_name"]) != 0:
+                raise Exception("CONT_SET_TCP_FAILED")
+            set_singularity_handling(DR_TASK_STOP)
+            px_check_at("P_WAIT")
+            state = px_gripper_state()
+            if state["obj"] != 3:
+                raise Exception("CONT_START_REQUIRES_EMPTY_STATIONARY_GRIPPER_AT_P_WAIT")
+        px_check_at("P_WAIT")
+        state = px_gripper_state()
+        if state["obj"] != 3:
+            raise Exception("CONT_GRIPPER_NOT_EMPTY_OR_STATIONARY_BEFORE_SCAN")
+        PX_SEQUENCE += 1
+        PX_PHASE = "READY_AT_WAIT"
+        px_send("READY_CONT_V1|"+PX_SESSION+"|"+str(PX_SEQUENCE))
+        while True:
+            fields = px_line(120).split("|")
+            if len(fields) >= 3 and fields[1:3] != [PX_SESSION, str(PX_SEQUENCE)]:
+                raise Exception("CONT_WRONG_SESSION_OR_SEQUENCE")
+            if len(fields) == 4 and fields[0] == "END_CONT_V1":
+                PX_STOPPED = True
+                tp_log("CONT_STOP_AT_P_WAIT="+fields[3])
+                px_disconnect()
+                return
+            if len(fields) == 3 and fields[0] == "WAIT_CONT_V1":
+                px_check_at("P_WAIT")
+                continue
+            if len(fields) != 22 or fields[0] != "PREPARE_CONT_V1":
+                raise Exception("CONT_WRONG_PREPARE_MESSAGE")
+            break
+        PX_JOB = fields[3]
+        if len(PX_JOB) != 32:
+            raise Exception("CONT_WRONG_JOB_ID")
+        values = [float(v) for v in fields[4:22]]
+        px_check_job(values)
+        pre, grasp, lift = values[0:6], values[6:12], values[12:18]
+        px_check_at("P_WAIT")
+        px_send("ARM_CONT_V1|"+px_prefix())
+        PX_PHASE = "WAIT_GO"
+        go = px_line(15)
+        if go.startswith("END_CONT_V1|"+PX_SESSION+"|"+str(PX_SEQUENCE)+"|"):
+            PX_STOPPED = True
+            tp_log("CONT_STOP_AT_P_WAIT="+go.split("|")[3])
+            px_disconnect()
+            return
+        if go != "GO_CONT_V1|"+px_prefix():
+            raise Exception("CONT_NO_GO")
+        px_check_at("P_WAIT")
+
+        px_gate("OPEN_AT_WAIT")
+        px_gripper(PX_CONTRACT["gripper"]["open_pr"], False)
+        px_check_at("P_WAIT")
+        px_reached("OPEN_AT_WAIT")
+        px_move("ABOVE_TARGET", lift)
+        px_move("PREGRASP", pre, True)
+        px_move("GRASP", grasp, True)
+        px_gate("CLOSE_GRIPPER")
+        px_gripper(PX_CONTRACT["gripper"]["close_pr"], True)
+        px_check_pose(grasp)
+        px_reached("CLOSE_GRIPPER")
+        px_move("RETREAT_TO_PREGRASP", pre, True)
+        px_move("LIFT_TO_TRANSFER_Z", lift, True)
+        px_move("WAIT_WITH_OBJECT", PX_CONTRACT["points"]["P_WAIT"]["pose"], False, "P_WAIT")
+        px_move("DROP_UP_WITH_OBJECT", PX_CONTRACT["points"]["P_DROP_UP"]["pose"], False, "P_DROP_UP")
+        px_move("DROP", PX_CONTRACT["points"]["P_DROP"]["pose"], True, "P_DROP")
+        px_gate("RELEASE_AT_DROP")
+        px_gripper(PX_CONTRACT["gripper"]["open_pr"], False)
+        px_check_at("P_DROP")
+        px_reached("RELEASE_AT_DROP")
+        px_move("DROP_UP_EMPTY", PX_CONTRACT["points"]["P_DROP_UP"]["pose"], True, "P_DROP_UP")
+        px_move("WAIT_EMPTY", PX_CONTRACT["points"]["P_WAIT"]["pose"], False, "P_WAIT")
+        state = px_gripper_state()
+        g = PX_CONTRACT["gripper"]
+        if state["obj"] != 3 or state["echo"] != g["open_pr"] or abs(state["pos"]-g["open_pr"]) > g["position_tolerance_raw"]:
+            raise Exception("CONT_FINAL_EMPTY_OPEN_STATE_NOT_CONFIRMED")
+        px_send("DONE_CONT_V1|"+px_prefix())
+        ack = px_line(15)
+        if ack == "ACK_DONE_CONT_V1|"+px_prefix()+"|END":
+            PX_STOPPED = True
+            px_disconnect()
+        elif ack != "ACK_DONE_CONT_V1|"+px_prefix()+"|MORE":
+            raise Exception("CONT_DONE_ACK_MISSING_DO_NOT_REPEAT")
+        tp_log("CONT_CYCLE_DONE="+str(PX_SEQUENCE))
+    except Exception as exc:
+        PX_STOPPED = True
+        tp_log("CONT_FAULT_PHASE="+PX_PHASE)
+        tp_log("CONT_FAULT="+str(exc))
+        if PX_SOCKET is not None:
+            try:
+                message = str(exc).replace("|", "/").replace("\n", " ")[:120]
+                px_send("ERROR_CONT_V1|"+PX_SESSION+"|"+str(PX_SEQUENCE)+"|"+message)
+            except Exception:
+                pass
+        px_disconnect()
+        raise

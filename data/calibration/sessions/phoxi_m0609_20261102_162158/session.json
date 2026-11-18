@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "kind": "phoxi_eye_to_hand",
+  "created_utc": "2026-11-02T09:22:16.739743+00:00",
+  "updated_utc": "2026-11-02T09:22:16.740022+00:00",
+  "demo": false,
+  "board": {
+    "type": "checkerboard",
+    "counts": "inner_corners",
+    "cols": 7,
+    "rows": 9,
+    "square_mm": 20.0,
+    "origin": "physically_marked_first_inner_corner",
+    "axes": "x=columns,y=rows,z=x_cross_y"
+  },
+  "robot_reference": "flange",
+  "robot_frame": "BASE",
+  "euler": "intrinsic_ZYZ",
+  "distance_unit": "millimetre",
+  "angle_unit": "degree",
+  "camera_identity": null,
+  "detection_settings": {
+    "corner_radius_px": 5,
+    "local_rms_max_mm": 0.5,
+    "min_3d_fraction": 0.7,
+    "corner_inlier_mm": 1.2,
+    "board_rms_max_mm": 1.0,
+    "square_relative_tolerance": 0.03
+  },
+  "solver_settings": {
+    "min_fit_samples": 6,
+    "min_validation_samples": 5,
+    "min_second_axis_deg": 3.0,
+    "rotation_weight_mm": 100.0,
+    "robust_scale_mm": 1.0,
+    "max_position_error_mm": 2.0,
+    "max_rotation_error_deg": 1.0
+  },
+  "samples": [],
+  "current_result": null
+}

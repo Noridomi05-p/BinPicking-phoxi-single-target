@@ -14,7 +14,7 @@ require_roi require_reference_identity max_frame_age_ms neighbor_jump_mm
 min_component_ratio core_fraction normal_radius_mm min_normal_points
 normal_inlier_deg max_normal_rms_mm max_tilt_deg plane_face_mm
 opening_gap_mm width_uncertainty_mm max_object_width_mm max_opening_mm
-max_geometry_points normal_map_enabled class_shapes clearance""".split())
+max_geometry_points normal_map_enabled class_shapes clearance robot_target""".split())
 CLEARANCE_KEYS = set("""enabled geometry_verified finger_thickness_mm finger_span_mm
 finger_length_mm palm_span_mm palm_width_mm palm_depth_mm insertion_depth_mm
 approach_mm safety_margin_mm vertical_motion_envelope_mm projection_max_error_px""".split())
@@ -61,6 +61,15 @@ def validate_config(config):
         raise ValueError("height_mode chi nhan camera_z hoac plane.")
     picking = config.get("picking", {})
     _keys(picking, PICKING_KEYS, "picking")
+    robot = picking.get("robot_target", {})
+    _keys(robot, set("enabled calibration_path tcp_name tcp_flange_xyzabc contact_center_flange_mm contact_reference_opening_mm fixed_opening_mm open_position_request grasp_depth_mm pregrasp_distance_mm rotation_proposal_tcp measurement_note".split()), "picking.robot_target")
+    if "enabled" in robot and not isinstance(robot["enabled"], bool):
+        raise ValueError("robot_target.enabled phai la true/false")
+    for key in ("fixed_opening_mm", "contact_reference_opening_mm"):
+        _number(robot, key, .001, 85)
+    _number(robot, "open_position_request", 0, 255, integer=True)
+    _number(robot, "grasp_depth_mm", 0, 100)
+    _number(robot, "pregrasp_distance_mm", .001, 500)
     for key in ("min_valid_ratio", "min_component_ratio", "core_fraction"):
         _number(picking, key, 0.000001, 1)
     for key in ("max_candidates", "min_points", "min_normal_points", "max_geometry_points"):

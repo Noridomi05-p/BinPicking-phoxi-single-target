@@ -1,0 +1,1 @@
+{"timestamp_utc": "2026-11-12T07:31:05.230540+00:00", "kind": "fault", "session": "875aa72e78614cb6a3a3645568c41d6b", "completed": 0, "phase": "WAIT_READY", "detail": "ROBOT_ERROR:ERROR_CONT_V1|875aa72e78614cb6a3a3645568c41d6b|0|CONT_POSITION_CHANGED_OR_NOT_REACHED", "motion_outcome_unconfirmed": false, "job_id": null}

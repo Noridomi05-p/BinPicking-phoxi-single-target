@@ -1,0 +1,2401 @@
+{
+  "schema_version": 1,
+  "kind": "phoxi_eye_to_hand",
+  "created_utc": "2026-11-02T09:41:10.396645+00:00",
+  "updated_utc": "2026-11-02T10:31:15.389518+00:00",
+  "demo": false,
+  "board": {
+    "type": "checkerboard",
+    "counts": "inner_corners",
+    "cols": 7,
+    "rows": 9,
+    "square_mm": 20.0,
+    "origin": "physically_marked_first_inner_corner",
+    "axes": "x=columns,y=rows,z=x_cross_y"
+  },
+  "robot_reference": "flange",
+  "robot_frame": "BASE",
+  "euler": "intrinsic_ZYZ",
+  "distance_unit": "millimetre",
+  "angle_unit": "degree",
+  "camera_identity": {
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "image_shape_hw": [
+      1544,
+      2064
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "roi_xyxy": null,
+    "calibration_id": "setup-001"
+  },
+  "detection_settings": {
+    "corner_radius_px": 5,
+    "local_rms_max_mm": 0.5,
+    "min_3d_fraction": 0.7,
+    "corner_inlier_mm": 1.2,
+    "board_rms_max_mm": 1.0,
+    "square_relative_tolerance": 0.03
+  },
+  "solver_settings": {
+    "min_fit_samples": 6,
+    "min_validation_samples": 5,
+    "min_second_axis_deg": 3.0,
+    "rotation_weight_mm": 100.0,
+    "robust_scale_mm": 1.0,
+    "max_position_error_mm": 2.0,
+    "max_rotation_error_deg": 1.0
+  },
+  "samples": [
+    {
+      "id": "C0001",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:41:15.814837+00:00",
+      "confirmed_at_utc": "2026-11-02T09:42:32.680943+00:00",
+      "frame_id": 0,
+      "robot_pose_xyzabc": [
+        -243.93,
+        168.61,
+        359.0,
+        163.29,
+        164.26,
+        -148.55
+      ],
+      "T_base_flange": [
+        [
+          -0.636414686923044,
+          0.7262722199236281,
+          -0.25981726046560033,
+          -243.93
+        ],
+        [
+          0.7358128027492296,
+          0.6726780638250183,
+          0.07799834459107761,
+          168.61
+        ],
+        [
+          0.2314214025948505,
+          -0.1415375745723736,
+          -0.9625025970901078,
+          359.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6617264578699626,
+          -0.6910701717138785,
+          0.29075782486843293,
+          48.698951972757285
+        ],
+        [
+          0.6298227856223025,
+          -0.722769534005527,
+          -0.2844775200686273,
+          -56.2521741064585
+        ],
+        [
+          0.40674482623118263,
+          -0.005120398498526047,
+          0.9135274642031185,
+          796.8047094612393
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7820068615767922,
+      "max_error_mm": 1.2001024846955646,
+      "measured_square_mm": 20.252252696207684,
+      "valid_corners": 63,
+      "inlier_corners": 53,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0002",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:44:07.874750+00:00",
+      "confirmed_at_utc": "2026-11-02T09:45:04.633258+00:00",
+      "frame_id": 1,
+      "robot_pose_xyzabc": [
+        -177.55,
+        241.31,
+        310.04,
+        163.29,
+        164.25,
+        -148.55
+      ],
+      "T_base_flange": [
+        [
+          -0.6363759898941935,
+          0.7262485527798582,
+          -0.2599781511422582,
+          -177.55
+        ],
+        [
+          0.7358011857219945,
+          0.6726851688111609,
+          0.07804664471716224,
+          241.31
+        ],
+        [
+          0.23156470926350628,
+          -0.14162522108248096,
+          -0.9624552364536473,
+          310.04
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6619759953535737,
+          -0.690068236439987,
+          0.2925638573581004,
+          127.82593716198986
+        ],
+        [
+          0.6296052453662626,
+          -0.7237388945725571,
+          -0.2824876059054297,
+          11.803455805593785
+        ],
+        [
+          0.4066755667395488,
+          -0.0028002748970479,
+          0.9135683564340259,
+          832.1142587086528
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7914692736812438,
+      "max_error_mm": 1.2605246731773394,
+      "measured_square_mm": 20.25030309223085,
+      "valid_corners": 63,
+      "inlier_corners": 57,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0003",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:46:58.697940+00:00",
+      "confirmed_at_utc": "2026-11-02T09:47:39.971408+00:00",
+      "frame_id": 2,
+      "robot_pose_xyzabc": [
+        -290.53,
+        271.87,
+        250.91,
+        163.29,
+        164.25,
+        -148.55
+      ],
+      "T_base_flange": [
+        [
+          -0.6363759898941935,
+          0.7262485527798582,
+          -0.2599781511422582,
+          -290.53
+        ],
+        [
+          0.7358011857219945,
+          0.6726851688111609,
+          0.07804664471716224,
+          271.87
+        ],
+        [
+          0.23156470926350628,
+          -0.14162522108248096,
+          -0.9624552364536473,
+          250.91
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6612804388620626,
+          -0.6893021856612243,
+          0.2959234327001783,
+          173.4889971231018
+        ],
+        [
+          0.6291507441282355,
+          -0.7244739434515005,
+          -0.2816147127241761,
+          -101.55591557529713
+        ],
+        [
+          0.40850645324313517,
+          -4.585293195790684e-05,
+          0.9127554303077154,
+          879.2862398646896
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7519911316593528,
+      "max_error_mm": 1.1323599614327855,
+      "measured_square_mm": 20.24839337474041,
+      "valid_corners": 59,
+      "inlier_corners": 52,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0004",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:48:40.366799+00:00",
+      "confirmed_at_utc": "2026-11-02T09:49:21.278906+00:00",
+      "frame_id": 3,
+      "robot_pose_xyzabc": [
+        -290.48,
+        367.27,
+        232.65,
+        163.29,
+        164.25,
+        -148.55
+      ],
+      "T_base_flange": [
+        [
+          -0.6363759898941935,
+          0.7262485527798582,
+          -0.2599781511422582,
+          -290.48
+        ],
+        [
+          0.7358011857219945,
+          0.6726851688111609,
+          0.07804664471716224,
+          367.27
+        ],
+        [
+          0.23156470926350628,
+          -0.14162522108248096,
+          -0.9624552364536473,
+          232.65
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6610737441269852,
+          -0.6893591945174318,
+          0.2962522670971617,
+          270.4229995851364
+        ],
+        [
+          0.6286744286827319,
+          -0.7244193453783344,
+          -0.2828163269015196,
+          -98.16825196615838
+        ],
+        [
+          0.40957290870658297,
+          -0.0007162233617566356,
+          0.9122771067377099,
+          877.4076450520795
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.6959913491799065,
+      "max_error_mm": 1.2149969593525574,
+      "measured_square_mm": 20.221771543008096,
+      "valid_corners": 47,
+      "inlier_corners": 47,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0005",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:49:54.374124+00:00",
+      "confirmed_at_utc": "2026-11-02T09:50:35.758087+00:00",
+      "frame_id": 4,
+      "robot_pose_xyzabc": [
+        -290.37,
+        158.4,
+        232.61,
+        163.28,
+        164.25,
+        -148.56
+      ],
+      "T_base_flange": [
+        [
+          -0.636374323751297,
+          0.7262548902179277,
+          -0.2599645254734293,
+          -290.37
+        ],
+        [
+          0.7357948482839259,
+          0.6726868349540566,
+          0.07809201827542031,
+          158.4
+        ],
+        [
+          0.23158942400056612,
+          -0.14158480325953013,
+          -0.9624552364536473,
+          232.61
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6614257205773277,
+          -0.6901158644233514,
+          0.29369390499289116,
+          66.19518181647162
+        ],
+        [
+          0.6298566757667666,
+          -0.7236972175593692,
+          -0.2820335180237714,
+          -106.75224340650394
+        ],
+        [
+          0.40718126694483486,
+          -0.0015591561940488325,
+          0.9133460378636137,
+          920.4332419342722
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7661771885653031,
+      "max_error_mm": 1.227231212412878,
+      "measured_square_mm": 20.26997125338808,
+      "valid_corners": 48,
+      "inlier_corners": 42,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0006",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:51:08.195799+00:00",
+      "confirmed_at_utc": "2026-11-02T09:51:51.631960+00:00",
+      "frame_id": 5,
+      "robot_pose_xyzabc": [
+        -290.22,
+        329.77,
+        366.43,
+        163.27,
+        164.25,
+        -148.57
+      ],
+      "T_base_flange": [
+        [
+          -0.636372659820686,
+          0.726261228237204,
+          -0.25995089188562803,
+          -290.22
+        ],
+        [
+          0.735788510264649,
+          0.6726884988846682,
+          0.07813738945485935,
+          329.77
+        ],
+        [
+          0.2316141316830087,
+          -0.1415443811236594,
+          -0.9624552364536474,
+          366.43
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6612080440330389,
+          -0.6897665188732266,
+          0.29500181685459737,
+          206.6129711324922
+        ],
+        [
+          0.628617240464463,
+          -0.7240282108233044,
+          -0.2839428022029208,
+          -95.43890719013544
+        ],
+        [
+          0.40944387588147646,
+          -0.002302036818713392,
+          0.9123324027620846,
+          754.6226738999881
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7501528106895295,
+      "max_error_mm": 1.187381712194659,
+      "measured_square_mm": 20.241058201190565,
+      "valid_corners": 55,
+      "inlier_corners": 53,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0007",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:52:32.312764+00:00",
+      "confirmed_at_utc": "2026-11-02T09:53:44.875037+00:00",
+      "frame_id": 6,
+      "robot_pose_xyzabc": [
+        -241.98,
+        329.75,
+        366.43,
+        143.28,
+        161.07,
+        -169.48
+      ],
+      "T_base_flange": [
+        [
+          -0.636305348095094,
+          0.7262888265163572,
+          -0.26003854418734584,
+          -241.98
+        ],
+        [
+          0.7024102590204935,
+          0.6848330049902864,
+          0.1939679955527145,
+          329.75
+        ],
+        [
+          0.3189597655008304,
+          -0.059230868248467974,
+          -0.945915626384398,
+          366.43
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6093453056276266,
+          -0.6816366435178364,
+          0.40505528600835855,
+          212.7485248734879
+        ],
+        [
+          0.6273556366482355,
+          -0.7268713402808797,
+          -0.2794332833503659,
+          -45.82948292491521
+        ],
+        [
+          0.4848950439788623,
+          0.08384235738584693,
+          0.8705442294523138,
+          728.3103966873222
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7818198883203167,
+      "max_error_mm": 1.2069782059383747,
+      "measured_square_mm": 20.250765880213507,
+      "valid_corners": 63,
+      "inlier_corners": 59,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0008",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:54:09.766433+00:00",
+      "confirmed_at_utc": "2026-11-02T09:55:01.187962+00:00",
+      "frame_id": 7,
+      "robot_pose_xyzabc": [
+        -241.98,
+        329.75,
+        366.43,
+        110.13,
+        161.07,
+        -169.48
+      ],
+      "T_base_flange": [
+        [
+          -0.14864048749947734,
+          0.9825685389828888,
+          -0.11164708539388331,
+          -241.98
+        ],
+        [
+          0.9360398888228926,
+          0.17621228801523459,
+          0.30459572565100607,
+          329.75
+        ],
+        [
+          0.31895976550083033,
+          -0.05923086824846792,
+          -0.945915626384398,
+          366.43
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.8416275687548447,
+          -0.18557985758766496,
+          0.507171718424393,
+          240.41098553699447
+        ],
+        [
+          0.14332521268090803,
+          -0.982182968554982,
+          -0.1215503997957059,
+          95.69063375474049
+        ],
+        [
+          0.5206927298530125,
+          -0.029609673052321744,
+          0.8532305364553903,
+          726.5156052552711
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7398148648037441,
+      "max_error_mm": 1.2314894925015154,
+      "measured_square_mm": 20.23043823330928,
+      "valid_corners": 59,
+      "inlier_corners": 58,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0009",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T09:55:24.516457+00:00",
+      "confirmed_at_utc": "2026-11-02T09:56:13.386585+00:00",
+      "frame_id": 8,
+      "robot_pose_xyzabc": [
+        -241.86,
+        227.98,
+        259.61,
+        110.13,
+        161.06,
+        -169.47
+      ],
+      "T_base_flange": [
+        [
+          -0.14844983186644486,
+          0.9825909046805211,
+          -0.1117039008179167,
+          -241.86
+        ],
+        [
+          0.9360183494122475,
+          0.17605863339434072,
+          0.3047507295658018,
+          227.98
+        ],
+        [
+          0.3191117311889295,
+          -0.0593167063012761,
+          -0.9458589912725743,
+          259.61
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.8431208510017815,
+          -0.18584198317045011,
+          0.5045889296222285,
+          162.81617108931763
+        ],
+        [
+          0.1438427096343389,
+          -0.9821291152897408,
+          -0.12137411497202445,
+          88.31744885070876
+        ],
+        [
+          0.518127885266836,
+          -0.029751608216449288,
+          0.8547855498997695,
+          851.8832905518117
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7782798022563083,
+      "max_error_mm": 1.1806475804703425,
+      "measured_square_mm": 20.240899693403804,
+      "valid_corners": 57,
+      "inlier_corners": 53,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0010",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:00:01.436498+00:00",
+      "confirmed_at_utc": "2026-11-02T10:00:43.869220+00:00",
+      "frame_id": 15,
+      "robot_pose_xyzabc": [
+        -329.57,
+        105.52,
+        259.59,
+        7.87,
+        -171.69,
+        68.68
+      ],
+      "T_base_flange": [
+        [
+          -0.4839259105183603,
+          0.8633184483977207,
+          -0.14316762827234286,
+          -329.57
+        ],
+        [
+          0.8735299045236128,
+          0.48636804140798684,
+          -0.01978974987023279,
+          105.52
+        ],
+        [
+          0.05254730280369775,
+          -0.13463797738049477,
+          -0.9895005790877262,
+          259.59
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.836370730503312,
+          -0.5111974869786797,
+          0.1978917139852977,
+          15.859587207671154
+        ],
+        [
+          0.4842440430622079,
+          -0.8581985922438644,
+          -0.1703023283147255,
+          -89.7513461245305
+        ],
+        [
+          0.2568885126200134,
+          -0.04660799907025117,
+          0.9653165214097114,
+          945.9405563429242
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7884902767392847,
+      "max_error_mm": 1.2580232186146048,
+      "measured_square_mm": 20.26873439272697,
+      "valid_corners": 57,
+      "inlier_corners": 47,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0011",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:01:19.203276+00:00",
+      "confirmed_at_utc": "2026-11-02T10:01:54.148650+00:00",
+      "frame_id": 16,
+      "robot_pose_xyzabc": [
+        -329.53,
+        105.51,
+        334.01,
+        144.77,
+        167.83,
+        -155.15
+      ],
+      "T_base_flange": [
+        [
+          -0.4821326103323506,
+          0.8590081043375682,
+          -0.17220111131026852,
+          -329.53
+        ],
+        [
+          0.8549589071585585,
+          0.5042384073777672,
+          0.12160960322020795,
+          105.51
+        ],
+        [
+          0.19129404884720605,
+          -0.08859291849527615,
+          -0.9775264097036622,
+          334.01
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.7883689631571141,
+          -0.5165714404269783,
+          0.33410825321409526,
+          14.718304563646157
+        ],
+        [
+          0.4789606089786362,
+          -0.8562124279038202,
+          -0.19364145565931798,
+          -90.34445332925878
+        ],
+        [
+          0.38609728434345536,
+          0.00736377880184082,
+          0.922428675716647,
+          836.2588113573797
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7985259016320341,
+      "max_error_mm": 1.1948851245034164,
+      "measured_square_mm": 20.274822781101424,
+      "valid_corners": 62,
+      "inlier_corners": 50,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0012",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:02:31.001712+00:00",
+      "confirmed_at_utc": "2026-11-02T10:05:10.870351+00:00",
+      "frame_id": 17,
+      "robot_pose_xyzabc": [
+        -169.52,
+        304.79,
+        333.95,
+        144.76,
+        167.83,
+        -155.16
+      ],
+      "T_base_flange": [
+        [
+          -0.4821333177239454,
+          0.8590119624035666,
+          -0.17217988380782104,
+          -169.52
+        ],
+        [
+          0.8549550490925604,
+          0.5042376999861719,
+          0.12163965613151473,
+          304.79
+        ],
+        [
+          0.19130950831476948,
+          -0.08855953003617992,
+          -0.9775264097036623,
+          333.95
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.7882090593279298,
+          -0.5152294597142089,
+          0.33654878195587634,
+          204.48692090111805
+        ],
+        [
+          0.4785330925013871,
+          -0.8569902554244602,
+          -0.19124272924369504,
+          78.01948632660742
+        ],
+        [
+          0.3869529146736573,
+          0.010310477686441579,
+          0.9220418297861753,
+          800.8134782932607
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7392922519803923,
+      "max_error_mm": 1.1725421885858918,
+      "measured_square_mm": 20.22874042535047,
+      "valid_corners": 59,
+      "inlier_corners": 58,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0013",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:06:09.746855+00:00",
+      "confirmed_at_utc": "2026-11-02T10:06:54.577169+00:00",
+      "frame_id": 18,
+      "robot_pose_xyzabc": [
+        -169.48,
+        323.19,
+        247.19,
+        121.87,
+        167.82,
+        -155.16
+      ],
+      "T_base_flange": [
+        [
+          -0.11160325280804304,
+          0.9874893391238896,
+          -0.11139802098479051,
+          -169.48
+        ],
+        [
+          0.9751339003473946,
+          0.1304197667113476,
+          0.17917745629468948,
+          323.19
+        ],
+        [
+          0.1914643318112847,
+          -0.08863119974152137,
+          -0.9774896010068019,
+          247.19
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.9091262840620454,
+          -0.15019401556362738,
+          0.38849859371226764,
+          246.5966113130334
+        ],
+        [
+          0.10940577889235766,
+          -0.9860808762646653,
+          -0.12519936505456555,
+          170.0332239326106
+        ],
+        [
+          0.40189522909894476,
+          -0.0713180422753084,
+          0.9129041360808504,
+          882.8220655930978
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.6616654229422054,
+      "max_error_mm": 1.1383930430634623,
+      "measured_square_mm": 20.211815199259938,
+      "valid_corners": 55,
+      "inlier_corners": 55,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0014",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:07:18.103090+00:00",
+      "confirmed_at_utc": "2026-11-02T10:08:35.206449+00:00",
+      "frame_id": 19,
+      "robot_pose_xyzabc": [
+        -139.91,
+        323.13,
+        191.24,
+        121.87,
+        167.82,
+        -155.16
+      ],
+      "T_base_flange": [
+        [
+          -0.11160325280804304,
+          0.9874893391238896,
+          -0.11139802098479051,
+          -139.91
+        ],
+        [
+          0.9751339003473946,
+          0.1304197667113476,
+          0.17917745629468948,
+          323.13
+        ],
+        [
+          0.1914643318112847,
+          -0.08863119974152137,
+          -0.9774896010068019,
+          191.24
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.9084053503273253,
+          -0.15075761355683487,
+          0.3899639232689834,
+          256.86961999006724
+        ],
+        [
+          0.10955940259559091,
+          -0.9859676249705555,
+          -0.12595467364421126,
+          197.56594859468234
+        ],
+        [
+          0.4034804292646505,
+          -0.07169368496995093,
+          0.9121751798508021,
+          938.4504648714552
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.6277787124709501,
+      "max_error_mm": 1.024288650128136,
+      "measured_square_mm": 20.20727392794857,
+      "valid_corners": 46,
+      "inlier_corners": 44,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0015",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:11:13.505338+00:00",
+      "confirmed_at_utc": "2026-11-02T10:11:56.189634+00:00",
+      "frame_id": 25,
+      "robot_pose_xyzabc": [
+        -345.46,
+        146.23,
+        250.86,
+        10.37,
+        -167.82,
+        24.83
+      ],
+      "T_base_flange": [
+        [
+          -0.9482264142340804,
+          0.24040571893831708,
+          -0.2075373644684952,
+          -345.46
+        ],
+        [
+          0.2533814403678724,
+          0.9666206719308605,
+          -0.03797791822933647,
+          146.23
+        ],
+        [
+          0.19147979795759246,
+          -0.08859778156185827,
+          -0.9774896010068019,
+          250.86
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.1971353208665372,
+          -0.9627344128248517,
+          0.18514890123799171,
+          -39.58218639240114
+        ],
+        [
+          0.9418410479488062,
+          -0.2384068980631634,
+          -0.236849300937528,
+          -251.9730995886351
+        ],
+        [
+          0.2721637478900201,
+          0.12768947223122518,
+          0.953741208617815,
+          928.0001277404872
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7535418449912294,
+      "max_error_mm": 1.1494129146498868,
+      "measured_square_mm": 20.27294301189808,
+      "valid_corners": 46,
+      "inlier_corners": 40,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0016",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:12:20.490755+00:00",
+      "confirmed_at_utc": "2026-11-02T10:13:09.360517+00:00",
+      "frame_id": 27,
+      "robot_pose_xyzabc": [
+        -309.82,
+        146.19,
+        309.68,
+        10.37,
+        -167.82,
+        24.82
+      ],
+      "T_base_flange": [
+        [
+          -0.9482683585049141,
+          0.24024021854774122,
+          -0.20753736446849516,
+          -309.82
+        ],
+        [
+          0.25321272937607864,
+          0.9666648806121396,
+          -0.037977918229336466,
+          146.19
+        ],
+        [
+          0.191495258271092,
+          -0.08856436068335241,
+          -0.9774896010068017,
+          309.68
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.19651432939182398,
+          -0.9633975800571128,
+          0.18233820522255167,
+          -53.09845285066683
+        ],
+        [
+          0.9415005303943667,
+          -0.2373332118270253,
+          -0.23926909083915485,
+          -214.82575000222016
+        ],
+        [
+          0.27378617498115065,
+          0.12465171199774132,
+          0.9536787095690166,
+          871.5830618966039
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.8010936373806528,
+      "max_error_mm": 1.217708689876923,
+      "measured_square_mm": 20.265210909473442,
+      "valid_corners": 61,
+      "inlier_corners": 50,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "C0017",
+      "role": "fit",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:14:29.256978+00:00",
+      "confirmed_at_utc": "2026-11-02T10:15:39.063184+00:00",
+      "frame_id": 29,
+      "robot_pose_xyzabc": [
+        -246.4,
+        252.57,
+        386.29,
+        178.19,
+        167.82,
+        -146.49
+      ],
+      "T_base_flange": [
+        [
+          -0.7971762606856918,
+          0.5657210777790725,
+          -0.21087833353775884,
+          -246.4
+        ],
+        [
+          0.5775496543043238,
+          0.8163283582266727,
+          0.0066639603766009,
+          252.57
+        ],
+        [
+          0.17591590664898307,
+          -0.11648035762062822,
+          -0.9774896010068017,
+          386.29
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.5182582692366676,
+          -0.8255240568108085,
+          0.22342425560900747,
+          95.12336806678748
+        ],
+        [
+          0.7915493795879078,
+          -0.5619309664909377,
+          -0.2401732053592976,
+          -91.1597245899235
+        ],
+        [
+          0.3238177667173505,
+          0.052379581185667656,
+          0.9446684251275695,
+          771.0552487124497
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7942312560678808,
+      "max_error_mm": 1.2311918501426542,
+      "measured_square_mm": 20.272427492800666,
+      "valid_corners": 61,
+      "inlier_corners": 50,
+      "total_corners": 63,
+      "origin_flipped_180": true,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "V0001",
+      "role": "validation",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:17:01.606472+00:00",
+      "confirmed_at_utc": "2026-11-02T10:17:44.521694+00:00",
+      "frame_id": 31,
+      "robot_pose_xyzabc": [
+        -246.36,
+        267.49,
+        320.75,
+        178.18,
+        167.82,
+        -146.49
+      ],
+      "T_base_flange": [
+        [
+          -0.7970754471139013,
+          0.5658635453382092,
+          -0.21087716724540614,
+          -246.36
+        ],
+        [
+          0.5776887790117103,
+          0.8162296088392303,
+          0.006700765487329653,
+          267.49
+        ],
+        [
+          0.17591590664898313,
+          -0.11648035762062822,
+          -0.9774896010068018,
+          320.75
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.5181479402017852,
+          -0.8250189625194116,
+          0.2255358586744926,
+          123.16612166175085
+        ],
+        [
+          0.7920278135638323,
+          -0.5623689862558839,
+          -0.23755644768943687,
+          -92.34768450101589
+        ],
+        [
+          0.32282294621966107,
+          0.05554128897426493,
+          0.9448282968948032,
+          831.8291663741767
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.775949563210103,
+      "max_error_mm": 1.1343501771813538,
+      "measured_square_mm": 20.265073979466404,
+      "valid_corners": 57,
+      "inlier_corners": 49,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "V0002",
+      "role": "validation",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:18:22.288855+00:00",
+      "confirmed_at_utc": "2026-11-02T10:19:02.618653+00:00",
+      "frame_id": 32,
+      "robot_pose_xyzabc": [
+        -174.48,
+        300.5,
+        270.5,
+        137.25,
+        167.81,
+        -146.48
+      ],
+      "T_base_flange": [
+        [
+          -0.22354340539183937,
+          0.9622817700504842,
+          -0.1550552834776262,
+          -174.48
+        ],
+        [
+          0.958665237599458,
+          0.24579871061066572,
+          0.1433316297280855,
+          300.5
+        ],
+        [
+          0.17603780311113448,
+          -0.11660526956635142,
+          -0.9774527625339058,
+          270.5
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.8948174648492238,
+          -0.2688451513579135,
+          0.3564042496830667,
+          220.07486162719118
+        ],
+        [
+          0.2207769303220101,
+          -0.9603709715518604,
+          -0.1701327247713586,
+          133.03932532659536
+        ],
+        [
+          0.38801965367542846,
+          -0.07355189726905105,
+          0.9187115253275782,
+          868.8699147602618
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7274212198769149,
+      "max_error_mm": 1.253726690223209,
+      "measured_square_mm": 20.230303462988488,
+      "valid_corners": 59,
+      "inlier_corners": 58,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "V0003",
+      "role": "validation",
+      "enabled": false,
+      "captured_at_utc": "2026-11-02T10:19:33.221439+00:00",
+      "confirmed_at_utc": "2026-11-02T10:20:11.044333+00:00",
+      "frame_id": 33,
+      "robot_pose_xyzabc": [
+        -392.2,
+        337.65,
+        270.47,
+        137.25,
+        167.81,
+        -146.48
+      ],
+      "T_base_flange": [
+        [
+          -0.22354340539183937,
+          0.9622817700504842,
+          -0.1550552834776262,
+          -392.2
+        ],
+        [
+          0.958665237599458,
+          0.24579871061066572,
+          0.1433316297280855,
+          337.65
+        ],
+        [
+          0.17603780311113448,
+          -0.11660526956635142,
+          -0.9774527625339058,
+          270.47
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.8943565953284335,
+          -0.2689844166563805,
+          0.3574544222534657,
+          260.35608889274005
+        ],
+        [
+          0.21981235812134808,
+          -0.9601614077623196,
+          -0.17254737975701617,
+          17.140477292933312
+        ],
+        [
+          0.3896264975712826,
+          -0.0757459876158891,
+          0.917852786535198,
+          857.2542398070882
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7470326315868517,
+      "max_error_mm": 1.353355371645165,
+      "measured_square_mm": 20.2295824725781,
+      "valid_corners": 55,
+      "inlier_corners": 53,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "V0004",
+      "role": "validation",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:21:11.936673+00:00",
+      "confirmed_at_utc": "2026-11-02T10:22:03.744946+00:00",
+      "frame_id": 34,
+      "robot_pose_xyzabc": [
+        -314.91,
+        144.64,
+        268.79,
+        176.49,
+        172.35,
+        -136.95
+      ],
+      "T_base_flange": [
+        [
+          -0.6811028554855654,
+          0.7200305777234678,
+          -0.13287161996686064,
+          -314.91
+        ],
+        [
+          0.7256966277257172,
+          0.687966555240179,
+          0.008150053894494767,
+          144.64
+        ],
+        [
+          0.09727951869191379,
+          -0.09087346155050222,
+          -0.9910997473659746,
+          268.79
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6809525012328259,
+          -0.6961693869771888,
+          0.2272704901665935,
+          39.15952549631348
+        ],
+        [
+          0.6794885226791643,
+          -0.7163686557765165,
+          -0.15846544282029848,
+          -120.56733063885135
+        ],
+        [
+          0.27312824572358874,
+          0.04652024996441868,
+          0.9608521362474053,
+          918.8562131212574
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7715845164590632,
+      "max_error_mm": 1.1653226378886055,
+      "measured_square_mm": 20.274473883062736,
+      "valid_corners": 55,
+      "inlier_corners": 43,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "V0005",
+      "role": "validation",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:24:32.098752+00:00",
+      "confirmed_at_utc": "2026-11-02T10:25:34.323889+00:00",
+      "frame_id": 35,
+      "robot_pose_xyzabc": [
+        -300.54,
+        201.53,
+        319.0,
+        176.47,
+        172.35,
+        -136.96
+      ],
+      "T_base_flange": [
+        [
+          -0.680975198663119,
+          0.7201518378582031,
+          -0.132868766966423,
+          -300.54
+        ],
+        [
+          0.7258142932591393,
+          0.6878418642135795,
+          0.00819643434204087,
+          201.53
+        ],
+        [
+          0.0972953776212489,
+          -0.0908564816875471,
+          -0.9910997473659744,
+          319.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.6811982310971094,
+          -0.6965610659307286,
+          0.22532565628355877,
+          83.9833217588703
+        ],
+        [
+          0.6790687347547041,
+          -0.7161896186575506,
+          -0.1610530459376581,
+          -102.49360453502507
+        ],
+        [
+          0.2735591771972103,
+          0.04330255831471531,
+          0.9608799430806045,
+          858.885635356652
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7959167982756555,
+      "max_error_mm": 1.1606823125587447,
+      "measured_square_mm": 20.277202324843408,
+      "valid_corners": 59,
+      "inlier_corners": 48,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    },
+    {
+      "id": "V0006",
+      "role": "validation",
+      "enabled": true,
+      "captured_at_utc": "2026-11-02T10:30:21.702543+00:00",
+      "confirmed_at_utc": "2026-11-02T10:31:05.672159+00:00",
+      "frame_id": 36,
+      "robot_pose_xyzabc": [
+        -207.31,
+        332.83,
+        267.14,
+        155.29,
+        172.35,
+        -136.95
+      ],
+      "T_base_flange": [
+        [
+          -0.3725786722337051,
+          0.920087254984133,
+          -0.12093211406542392,
+          -207.31
+        ],
+        [
+          0.9228877657871726,
+          0.38102684577545554,
+          0.05564813167365386,
+          332.83
+        ],
+        [
+          0.09727951869191381,
+          -0.09087346155050223,
+          -0.991099747365975,
+          267.14
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "T_camera_board": [
+        [
+          -0.8763937549757151,
+          -0.3968922607696559,
+          0.2727829165851809,
+          244.91436027734215
+        ],
+        [
+          0.3711819269524481,
+          -0.9175609010101353,
+          -0.14249901768551285,
+          73.3172714017509
+        ],
+        [
+          0.3068516960087296,
+          -0.023633160571961055,
+          0.9514638776001673,
+          882.5383622973593
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ],
+      "rms_mm": 0.7254001167931027,
+      "max_error_mm": 1.181530078265308,
+      "measured_square_mm": 20.224615386847486,
+      "valid_corners": 50,
+      "inlier_corners": 49,
+      "total_corners": 63,
+      "origin_flipped_180": false,
+      "method": "organized_xyz_local_affine_then_rigid_3d",
+      "stationary_confirmed": true,
+      "origin_confirmed": true,
+      "camera_identity": {
+        "device_id": "JEJ-043",
+        "coordinate_space": "CameraSpace/PrimaryCamera",
+        "image_shape_hw": [
+          1544,
+          2064
+        ],
+        "source_shape_hw": [
+          1544,
+          2064
+        ],
+        "roi_xyxy": null,
+        "calibration_id": "setup-001"
+      },
+      "board": {
+        "type": "checkerboard",
+        "counts": "inner_corners",
+        "cols": 7,
+        "rows": 9,
+        "square_mm": 20.0,
+        "origin": "physically_marked_first_inner_corner",
+        "axes": "x=columns,y=rows,z=x_cross_y"
+      },
+      "demo": false
+    }
+  ],
+  "current_result": "results/calibration_e51c36bc60870f51.json"
+}

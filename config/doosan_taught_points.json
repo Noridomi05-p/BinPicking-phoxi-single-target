@@ -1,0 +1,82 @@
+{
+  "schema": "PHOXI_DOOSAN_TAUGHT_POINTS_V1",
+  "tcp_name": "2F 85",
+  "frame": "BASE",
+  "distance_unit": "millimetre",
+  "angle_unit": "degree",
+  "euler": "intrinsic_ZYZ",
+  "transfer_tcp_z_mm": 170.0,
+  "tcp_flange_xyzabc": [
+    0.809,
+    0.369,
+    185.271,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "route_verified_on_real_robot": true,
+  "points": {
+    "P_WAIT": {
+      "xyzabc": [
+        -405.39,
+        -40.539,
+        200.26,
+        27.569,
+        -179.0,
+        120.349
+      ],
+      "joints": [
+        -175.355,
+        5.143,
+        90.761,
+        0.392,
+        83.176,
+        277.381
+      ],
+      "solution_space": 2,
+      "source_image": "image(20261104-114021).png"
+    },
+    "P_DROP_UP": {
+      "xyzabc": [
+        -530.26,
+        -264.91,
+        214.56,
+        34.62,
+        -176.63,
+        106.24
+      ],
+      "joints": [
+        -154.254,
+        30.517,
+        54.609,
+        0.52,
+        91.544,
+        277.396
+      ],
+      "solution_space": 2,
+      "source_image": "image(20261104-114017).png"
+    },
+    "P_DROP": {
+      "xyzabc": [
+        -530.156,
+        -264.862,
+        108.119,
+        34.622,
+        -176.632,
+        106.242
+      ],
+      "joints": [
+        -154.253,
+        31.434,
+        69.816,
+        0.537,
+        75.424,
+        277.247
+      ],
+      "solution_space": 2,
+      "source_image": "image(20261104-114012).png"
+    }
+  },
+  "route_verification_basis": "Operator reported transfer route completed without errors on 2026-11-04; no final route log attached.",
+  "full_pick_cycle_verified_on_real_robot": false
+}

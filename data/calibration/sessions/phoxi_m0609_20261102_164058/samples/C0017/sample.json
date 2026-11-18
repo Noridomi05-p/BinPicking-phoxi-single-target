@@ -1,0 +1,102 @@
+{
+  "id": "C0017",
+  "role": "fit",
+  "enabled": true,
+  "captured_at_utc": "2026-11-02T10:14:29.256978+00:00",
+  "confirmed_at_utc": "2026-11-02T10:15:39.063184+00:00",
+  "frame_id": 29,
+  "robot_pose_xyzabc": [
+    -246.4,
+    252.57,
+    386.29,
+    178.19,
+    167.82,
+    -146.49
+  ],
+  "T_base_flange": [
+    [
+      -0.7971762606856918,
+      0.5657210777790725,
+      -0.21087833353775884,
+      -246.4
+    ],
+    [
+      0.5775496543043238,
+      0.8163283582266727,
+      0.0066639603766009,
+      252.57
+    ],
+    [
+      0.17591590664898307,
+      -0.11648035762062822,
+      -0.9774896010068017,
+      386.29
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_camera_board": [
+    [
+      -0.5182582692366676,
+      -0.8255240568108085,
+      0.22342425560900747,
+      95.12336806678748
+    ],
+    [
+      0.7915493795879078,
+      -0.5619309664909377,
+      -0.2401732053592976,
+      -91.1597245899235
+    ],
+    [
+      0.3238177667173505,
+      0.052379581185667656,
+      0.9446684251275695,
+      771.0552487124497
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "rms_mm": 0.7942312560678808,
+  "max_error_mm": 1.2311918501426542,
+  "measured_square_mm": 20.272427492800666,
+  "valid_corners": 61,
+  "inlier_corners": 50,
+  "total_corners": 63,
+  "origin_flipped_180": true,
+  "method": "organized_xyz_local_affine_then_rigid_3d",
+  "stationary_confirmed": true,
+  "origin_confirmed": true,
+  "camera_identity": {
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "image_shape_hw": [
+      1544,
+      2064
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "roi_xyxy": null,
+    "calibration_id": "setup-001"
+  },
+  "board": {
+    "type": "checkerboard",
+    "counts": "inner_corners",
+    "cols": 7,
+    "rows": 9,
+    "square_mm": 20.0,
+    "origin": "physically_marked_first_inner_corner",
+    "axes": "x=columns,y=rows,z=x_cross_y"
+  },
+  "demo": false
+}

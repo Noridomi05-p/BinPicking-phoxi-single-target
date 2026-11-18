@@ -31,6 +31,12 @@ def freshness(frame, max_age_ms, offline=False):
 
 def plan_single_target(frame, results, settings, measurement_settings, postprocessor=None, offline=False):
     import cv2
+    robot_settings = settings.get("robot_target", {})
+    if robot_settings.get("enabled", False):
+        settings = dict(settings)
+        from .robot_target import scalar
+        settings["max_opening_mm"] = min(float(settings.get("max_opening_mm", 85)),
+                                         scalar(robot_settings, "fixed_opening_mm", 1, 85))
     started = time.perf_counter()
     output = {"enabled": True, "status": "NO_TARGET", "target_instance_id": None,
               "pose": None, "ranking": [], "attempts": [], "robot_ready": False,
@@ -101,6 +107,9 @@ def plan_single_target(frame, results, settings, measurement_settings, postproce
             projection = fit_projection(frame, float(clearance_settings.get("projection_max_error_px", .5)))
             projection_done = True
         for pose in poses:
+            if robot_settings.get("enabled", False):
+                pose["required_opening_mm"] = pose["proposed_opening_mm"]
+                pose["proposed_opening_mm"] = float(robot_settings["fixed_opening_mm"])
             pose["clearance"] = check_approach(frame, pose["surface_anchor_xyz_mm"], pose["rotation_camera"],
                                               pose["proposed_opening_mm"], clearance_settings, projection)
             attempt["poses"].append(pose)
@@ -128,4 +137,7 @@ def plan_single_target(frame, results, settings, measurement_settings, postproce
     output["timings_ms"] = {"rank": (ranked_at-started)*1000,
                             "geometry_and_clearance": (time.perf_counter()-ranked_at)*1000,
                             "total": (time.perf_counter()-started)*1000}
+    if robot_settings.get("enabled", False):
+        from .robot_target import attach_preview
+        return attach_preview(frame, output, robot_settings)
     return output

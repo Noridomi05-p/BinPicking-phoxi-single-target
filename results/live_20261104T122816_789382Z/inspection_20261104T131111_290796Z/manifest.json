@@ -1,0 +1,12 @@
+{
+  "replay.yaml": "87a45df18c6674fa951831a51d5a066a102fe24da6f8942208c97e683684a8c5",
+  "masks.npz": "0dc309c3f2ca86c58ef363a940f9220f9cc08936b3db5fecaa44ed35587549a0",
+  "result.json": "72a0f4e4ba71b9dd4c987d719e6e044ee38212a3323233d92177ddae101864dd",
+  "dashboard.png": "2dc283be4ac212daf3b3cde2f647ff82c33df74d7b4a1f4bbdee204872722fe4",
+  "images/frame.png": "f1fe27070753035737387aee3bb60e7cb67578fd8c30635fbe7b58789d399868",
+  "scans/frame.npz": "5954b4db20f3be13c4717d180a4c85374112f0a047878d9a4e5c682dec57ec0c",
+  "metadata/frame.json": "4d00ff274b05060c93fbb463f2f7d955e1ba9f525b05b42f2c12c6606310a6d6",
+  "reference/bin_roi.json": "27e82fcf5144bdf0defe3ca264cc736d79c765669b9e92f2355f61c8f55cc8d1",
+  "reference/bin_surface.npz": "71375b97af07d05719dddf230fac9d64451a6a2fa2f101cd44c327a6239bb405",
+  "reference/bin_floor_roi.json": "5608a60af9fdd5286632ce037b5bb7e71b02108634c7b5dc424c92f3f53f7ffb"
+}

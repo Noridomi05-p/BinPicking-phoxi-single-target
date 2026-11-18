@@ -1,0 +1,42 @@
+continuous:
+  listen: 192.168.137.50
+  port: 20005
+  peer: 192.168.137.100
+  points_path: config/doosan_taught_points.json
+  output_dir: results/continuous
+  max_cycles: 5
+  no_target_retries: 2
+  settle_seconds: 0.5
+  stage_timeout_seconds: 300
+  camera_settings_source: config
+  camera_overrides:
+    texture_source: LED
+    shutter_multiplier: 1
+    laser_power: 2048
+    led_power: 2048
+  save_scan_npz: false
+  motion:
+    transfer_tcp_z_mm: 170.0
+    travel_velocity:
+    - 150
+    - 20
+    travel_acceleration:
+    - 300
+    - 40
+    approach_velocity:
+    - 30
+    - 5
+    approach_acceleration:
+    - 60
+    - 10
+    max_descent_mm: 100
+  gripper:
+    open_pr: 30
+    close_pr: 255
+    speed_force_word: 30
+    status_signal: 2F_GS_1
+    fault_echo_signal: 2F_FS_PRE_1
+    position_current_signal: 2F_PO_CU_1
+    poll_seconds: 0.05
+    timeout_seconds: 8
+    position_tolerance_raw: 3

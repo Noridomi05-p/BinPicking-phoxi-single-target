@@ -176,6 +176,8 @@ def main() -> int:
         if reason.endswith('_same_frame') and pipeline.last_picking.get('enabled'):
             pipeline.last_picking.update(status='RECAPTURE_REQUIRED', target_instance_id=None, pose=None,
                 reasons=['SETTINGS_CHANGED_CAPTURE_NEW_FRAME'])
+            if 'tcp_preview' in pipeline.last_picking:
+                pipeline.last_picking['tcp_preview'] = None
         diagnostics = frame_diagnostics(frame, measurement_cfg, postprocessor)
         record = {
             'frame_index': max(0, frame_index - 1) if reason.endswith('_same_frame') else frame_index,

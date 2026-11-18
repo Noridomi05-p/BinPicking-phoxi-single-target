@@ -1,0 +1,149 @@
+{
+  "protocol": "PHOXI_CONT_V1",
+  "controller_revision": 2,
+  "tcp_name": "2F 85",
+  "tcp": [
+    0.809,
+    0.369,
+    185.271,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "points": {
+    "P_WAIT": {
+      "pose": [
+        -405.39,
+        -40.539,
+        200.26,
+        27.569,
+        -179.0,
+        120.349
+      ],
+      "joints": [
+        -175.355,
+        5.143,
+        90.761,
+        0.392,
+        83.176,
+        277.381
+      ]
+    },
+    "P_DROP_UP": {
+      "pose": [
+        -530.26,
+        -264.91,
+        214.56,
+        34.62,
+        -176.63,
+        106.24
+      ],
+      "joints": [
+        -154.254,
+        30.517,
+        54.609,
+        0.52,
+        91.544,
+        277.396
+      ]
+    },
+    "P_DROP": {
+      "pose": [
+        -530.156,
+        -264.862,
+        108.119,
+        34.622,
+        -176.632,
+        106.242
+      ],
+      "joints": [
+        -154.253,
+        31.434,
+        69.816,
+        0.537,
+        75.424,
+        277.247
+      ]
+    }
+  },
+  "contact_center_flange_mm": [
+    0.809,
+    0.369,
+    170.0
+  ],
+  "robot_target": {
+    "enabled": true,
+    "calibration_path": "/home/noridomi-05/phoxi-single-target/config/phoxi_camera_to_base.json",
+    "tcp_name": "2F 85",
+    "tcp_flange_xyzabc": [
+      0.809,
+      0.369,
+      185.271,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "contact_center_flange_mm": [
+      0.809,
+      0.369,
+      170.0
+    ],
+    "contact_reference_opening_mm": 75.0,
+    "fixed_opening_mm": 75.0,
+    "open_position_request": 30,
+    "grasp_depth_mm": 5.0,
+    "pregrasp_distance_mm": 50.0,
+    "rotation_proposal_tcp": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ],
+    "measurement_note": "170 mm approximate; contact X/Y assumed same as current TCP; verify physical geometry"
+  },
+  "motion": {
+    "transfer_tcp_z_mm": 170.0,
+    "travel_velocity": [
+      150.0,
+      20.0
+    ],
+    "travel_acceleration": [
+      300.0,
+      40.0
+    ],
+    "approach_velocity": [
+      30.0,
+      5.0
+    ],
+    "approach_acceleration": [
+      60.0,
+      10.0
+    ],
+    "max_descent_mm": 100.0
+  },
+  "gripper": {
+    "open_pr": 30,
+    "close_pr": 255,
+    "speed_force_word": 30,
+    "status_signal": "2F_GS_1",
+    "fault_echo_signal": "2F_FS_PRE_1",
+    "position_current_signal": "2F_PO_CU_1",
+    "poll_seconds": 0.05,
+    "timeout_seconds": 8.0,
+    "position_tolerance_raw": 3
+  },
+  "calibration_sha256": "010588db22adbb4e01c91fd3cc79d9b7593d5237392416e07c12cb4253f893ad",
+  "max_frame_age_seconds": 20.0,
+  "max_tilt_deg": 25.0
+}

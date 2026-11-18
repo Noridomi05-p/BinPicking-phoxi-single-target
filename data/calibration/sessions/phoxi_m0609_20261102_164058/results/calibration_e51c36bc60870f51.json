@@ -1,0 +1,386 @@
+{
+  "schema_version": 1,
+  "method": "eye_to_hand_3d_board_joint_se3",
+  "equation": "T_base_flange[i] @ T_flange_board = T_base_camera @ T_camera_board[i]",
+  "distance_unit": "millimetre",
+  "robot_angle_unit": "degree",
+  "robot_euler": "intrinsic_ZYZ",
+  "robot_reference": "flange",
+  "robot_frame": "BASE",
+  "coordinate_space": "CameraSpace/PrimaryCamera",
+  "T_base_camera": [
+    [
+      -0.03526602970743637,
+      0.9987102801785369,
+      0.036525106630676055,
+      -341.3598112000298
+    ],
+    [
+      0.9776176955457728,
+      0.0420603034897245,
+      -0.20614211657525214,
+      493.3759313899495
+    ],
+    [
+      -0.20741250807134748,
+      0.028437776566748507,
+      -0.9778401425383869,
+      1025.2574817798197
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_flange_board": [
+    [
+      -0.9989490008194402,
+      -0.0453431564570043,
+      0.006700143607274362,
+      202.94649088195388
+    ],
+    [
+      0.045385692956550004,
+      -0.998949425828568,
+      0.006339046586710128,
+      64.08842982069616
+    ],
+    [
+      0.006405672228286237,
+      0.006636474914466509,
+      0.9999574613772396,
+      168.77768205708577
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "fit": {
+    "count": 17,
+    "position_rms_mm": 0.5037200817378299,
+    "position_max_mm": 0.9507039271688956,
+    "rotation_rms_deg": 0.15283670952348005,
+    "rotation_max_deg": 0.358243564349267
+  },
+  "validation": {
+    "count": 5,
+    "position_rms_mm": 0.415411397566782,
+    "position_max_mm": 0.6742780111512863,
+    "rotation_rms_deg": 0.09848232058353117,
+    "rotation_max_deg": 0.12366877730377385
+  },
+  "residuals": [
+    {
+      "id": "C0001",
+      "role": "fit",
+      "position_error_mm": 0.2846750358014398,
+      "rotation_error_deg": 0.204877834259973,
+      "position_delta_base_mm": [
+        0.24035876664009947,
+        0.1480088189927642,
+        -0.03689076860365503
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0002",
+      "role": "fit",
+      "position_error_mm": 0.5284324681905092,
+      "rotation_error_deg": 0.09464732984232867,
+      "position_delta_base_mm": [
+        0.3482245441728651,
+        0.38135527046267725,
+        -0.11202097108957787
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0003",
+      "role": "fit",
+      "position_error_mm": 0.30222670789274914,
+      "rotation_error_deg": 0.14104558908953985,
+      "position_delta_base_mm": [
+        0.22766180408387982,
+        -0.029690881024691862,
+        0.19654398364981773
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0004",
+      "role": "fit",
+      "position_error_mm": 0.3237018239350845,
+      "rotation_error_deg": 0.1438990405128229,
+      "position_delta_base_mm": [
+        0.07386298998432039,
+        -0.13555110368201895,
+        0.28452245573954826
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0005",
+      "role": "fit",
+      "position_error_mm": 0.42559820252429037,
+      "rotation_error_deg": 0.059207496651278065,
+      "position_delta_base_mm": [
+        0.16171729292130976,
+        -0.1591912340232966,
+        0.3600548543933968
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0006",
+      "role": "fit",
+      "position_error_mm": 0.5138039857756752,
+      "rotation_error_deg": 0.0981815729723257,
+      "position_delta_base_mm": [
+        0.29919093997887103,
+        0.39563016818385677,
+        -0.13400032558297426
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0007",
+      "role": "fit",
+      "position_error_mm": 0.5682168724311902,
+      "rotation_error_deg": 0.16135250638765347,
+      "position_delta_base_mm": [
+        0.4265619394328155,
+        0.3705674604899514,
+        -0.059959012407034606
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0008",
+      "role": "fit",
+      "position_error_mm": 0.3764914951346069,
+      "rotation_error_deg": 0.20141419326283252,
+      "position_delta_base_mm": [
+        0.283454208068207,
+        0.24713740306890486,
+        -0.01796279047016469
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0009",
+      "role": "fit",
+      "position_error_mm": 0.10525250763327847,
+      "rotation_error_deg": 0.07721461993130024,
+      "position_delta_base_mm": [
+        0.0847706531460517,
+        -0.006547045744355273,
+        0.06204162248286593
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0010",
+      "role": "fit",
+      "position_error_mm": 0.6765254919575723,
+      "rotation_error_deg": 0.12529796081323516,
+      "position_delta_base_mm": [
+        -0.38828618244502877,
+        -0.5229375880239786,
+        -0.182912166960989
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0011",
+      "role": "fit",
+      "position_error_mm": 0.4244153717934011,
+      "rotation_error_deg": 0.15719554958497414,
+      "position_delta_base_mm": [
+        -0.17401419632369652,
+        -0.2850149113724001,
+        -0.2619426799659266
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0012",
+      "role": "fit",
+      "position_error_mm": 0.3616883391499557,
+      "rotation_error_deg": 0.053064551813814274,
+      "position_delta_base_mm": [
+        -0.027933505083495902,
+        0.34011291444346625,
+        -0.11983897279088751
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0013",
+      "role": "fit",
+      "position_error_mm": 0.4676331394058326,
+      "rotation_error_deg": 0.03765814163475437,
+      "position_delta_base_mm": [
+        -0.35284873841294484,
+        -0.07157491951238626,
+        0.2984217682538315
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0014",
+      "role": "fit",
+      "position_error_mm": 0.9507039271688956,
+      "rotation_error_deg": 0.0937242916529189,
+      "position_delta_base_mm": [
+        -0.7560885909299486,
+        -0.2778210640968837,
+        0.5049588657940376
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0015",
+      "role": "fit",
+      "position_error_mm": 0.4964220257287289,
+      "rotation_error_deg": 0.358243564349267,
+      "position_delta_base_mm": [
+        -0.19705230850661337,
+        -0.4105402755748173,
+        -0.19764082946542771
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0016",
+      "role": "fit",
+      "position_error_mm": 0.4706068570039575,
+      "rotation_error_deg": 0.14739437561469687,
+      "position_delta_base_mm": [
+        -0.30246758370981297,
+        -0.3605133426300142,
+        0.0037821223703815576
+      ],
+      "review_required": false
+    },
+    {
+      "id": "C0017",
+      "role": "fit",
+      "position_error_mm": 0.690790400788496,
+      "rotation_error_deg": 0.12794071606902296,
+      "position_delta_base_mm": [
+        -0.0742081731905273,
+        0.365446489935664,
+        -0.5814923798700704
+      ],
+      "review_required": false
+    },
+    {
+      "id": "V0001",
+      "role": "validation",
+      "position_error_mm": 0.41989718841005064,
+      "rotation_error_deg": 0.1141495503034902,
+      "position_delta_base_mm": [
+        -0.09960583415175961,
+        0.2543906032001928,
+        -0.3188694837093067
+      ],
+      "review_required": false
+    },
+    {
+      "id": "V0002",
+      "role": "validation",
+      "position_error_mm": 0.17178901266035598,
+      "rotation_error_deg": 0.0947725332396581,
+      "position_delta_base_mm": [
+        -0.17157631902352932,
+        0.008222056260024146,
+        -0.0023301098714512136
+      ],
+      "review_required": false
+    },
+    {
+      "id": "V0004",
+      "role": "validation",
+      "position_error_mm": 0.35140633666207005,
+      "rotation_error_deg": 0.09934589655343855,
+      "position_delta_base_mm": [
+        -0.17375425923927423,
+        -0.21091419568296033,
+        -0.22093228125802966
+      ],
+      "review_required": false
+    },
+    {
+      "id": "V0005",
+      "role": "validation",
+      "position_error_mm": 0.6742780111512863,
+      "rotation_error_deg": 0.12366877730377385,
+      "position_delta_base_mm": [
+        -0.29868767495611337,
+        -0.181446089543158,
+        -0.5766401180467255
+      ],
+      "review_required": false
+    },
+    {
+      "id": "V0006",
+      "role": "validation",
+      "position_error_mm": 0.2808394250600499,
+      "rotation_error_deg": 0.036308550020883144,
+      "position_delta_base_mm": [
+        -0.17221931766070497,
+        0.025556129352253265,
+        -0.22035919210478028
+      ],
+      "review_required": false
+    }
+  ],
+  "coverage": {
+    "independent_axis_rms_deg": [
+      29.541485764549535,
+      5.216680702786203,
+      2.6523960647271365
+    ],
+    "max_pair_rotation_deg": 68.51954990609272
+  },
+  "jacobian_rank": 12,
+  "quality_limits": {
+    "position_max_mm": 2.0,
+    "rotation_max_deg": 1.0,
+    "min_validation_samples": 5
+  },
+  "status": "VERIFIED_WITHIN_CONFIGURED_LIMITS",
+  "issues": [],
+  "robot_ready": false,
+  "created_utc": "2026-11-02T10:31:15.378505+00:00",
+  "dataset_fingerprint": "e51c36bc60870f51b5e821596cb396c2aee42ede7135d58fcbc392875c65998c",
+  "camera_identity": {
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "image_shape_hw": [
+      1544,
+      2064
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "roi_xyxy": null,
+    "calibration_id": "setup-001"
+  },
+  "board": {
+    "type": "checkerboard",
+    "counts": "inner_corners",
+    "cols": 7,
+    "rows": 9,
+    "square_mm": 20.0,
+    "origin": "physically_marked_first_inner_corner",
+    "axes": "x=columns,y=rows,z=x_cross_y"
+  },
+  "demo": false
+}

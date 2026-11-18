@@ -1,0 +1,408 @@
+{
+  "frame_id": 1,
+  "timestamp_utc": "2026-11-12T07:32:49.875765+00:00",
+  "captured_at_utc": "2026-11-12T07:32:46.455827+00:00",
+  "picking": {
+    "enabled": true,
+    "status": "NO_TARGET",
+    "target_instance_id": null,
+    "pose": null,
+    "ranking": [
+      {
+        "instance_id": 0,
+        "class_name": "lo_nhua_nap_xanh",
+        "pick_score": 0.8870812633257996,
+        "height_percentile_mm": 91.43682277638823,
+        "height_mode": "plane",
+        "valid_ratio": 0.8548545735562737,
+        "eligible": true,
+        "reasons": [],
+        "full_object_integrity": "UNVERIFIED"
+      },
+      {
+        "instance_id": 1,
+        "class_name": "hop_anibox",
+        "pick_score": 0.6454841894109291,
+        "height_percentile_mm": 59.80455491614712,
+        "height_mode": "plane",
+        "valid_ratio": 0.7816956302443945,
+        "eligible": true,
+        "reasons": [],
+        "full_object_integrity": "UNVERIFIED"
+      },
+      {
+        "instance_id": 2,
+        "class_name": "khoi_lap_phuong",
+        "pick_score": 0.6309200916684105,
+        "height_percentile_mm": 59.8075336478381,
+        "height_mode": "plane",
+        "valid_ratio": 0.7822274989725558,
+        "eligible": true,
+        "reasons": [],
+        "full_object_integrity": "UNVERIFIED"
+      }
+    ],
+    "attempts": [
+      {
+        "instance_id": 0,
+        "pick_score": 0.8870812633257996,
+        "poses": [],
+        "reason": "NO_ORIENTATION_WITHIN_OPENING_LIMIT"
+      },
+      {
+        "instance_id": 1,
+        "pick_score": 0.6454841894109291,
+        "poses": [],
+        "reason": "NO_ORIENTATION_WITHIN_OPENING_LIMIT"
+      },
+      {
+        "instance_id": 2,
+        "pick_score": 0.6309200916684105,
+        "poses": [],
+        "reason": "NO_ORIENTATION_WITHIN_OPENING_LIMIT"
+      }
+    ],
+    "robot_ready": false,
+    "coordinate_space": "camera",
+    "distance_unit": "millimetre",
+    "backend": "deterministic_surface_geometry",
+    "automatic_mask_merge": false,
+    "freshness": {
+      "evaluated_at_utc": "2026-11-12T07:32:50.152724+00:00",
+      "captured_at_utc": "2026-11-12T07:32:46.455827+00:00",
+      "valid_until_utc": "2026-11-12T07:33:06.455827+00:00",
+      "age_ms": 3696.897,
+      "status": "FRESH"
+    },
+    "reference": {
+      "identity_status": "MATCH",
+      "floor_plane_available": true,
+      "identity_differences": {},
+      "identity_details": {
+        "status": "MATCH",
+        "differences": {},
+        "saved_identity": {
+          "shape_hw": [
+            800,
+            800
+          ],
+          "device_id": "JEJ-043",
+          "coordinate_space": "CameraSpace/PrimaryCamera",
+          "roi_xyxy": [
+            620,
+            280,
+            1420,
+            1080
+          ],
+          "source_shape_hw": [
+            1544,
+            2064
+          ],
+          "calibration_id": "setup-001",
+          "texture_source": "LED",
+          "led_power": 2048
+        },
+        "frame_identity": {
+          "shape_hw": [
+            800,
+            800
+          ],
+          "device_id": "JEJ-043",
+          "coordinate_space": "CameraSpace/PrimaryCamera",
+          "roi_xyxy": [
+            620,
+            280,
+            1420,
+            1080
+          ],
+          "source_shape_hw": [
+            1544,
+            2064
+          ],
+          "calibration_id": "setup-001",
+          "texture_source": "LED",
+          "led_power": 2048
+        },
+        "reference_path": "/home/noridomi-05/phoxi-single-target/data/calibration/bin_surface.npz",
+        "run_live_capture_settings": {
+          "texture_source": "LED",
+          "led_power": 1048
+        }
+      }
+    },
+    "timings_ms": {
+      "rank": 0.10246900001220638,
+      "geometry_and_clearance": 98.31131100054336,
+      "total": 98.41409100044984
+    },
+    "tcp_preview": null
+  },
+  "objects": [
+    {
+      "instance_id": 0,
+      "class_id": 0,
+      "class_name": "lo_nhua_nap_xanh",
+      "confidence": 0.9118391275405884,
+      "bbox_xyxy": [
+        472,
+        191,
+        667,
+        379
+      ],
+      "verified_3d": true,
+      "measurement": {
+        "valid": true,
+        "reason": null,
+        "point_count": 24336,
+        "mask_pixel_count": 28468,
+        "valid_ratio": 0.8548545735562737,
+        "center_xyz_mm": [
+          74.65068054199219,
+          -71.49054718017578,
+          955.1644287109375
+        ],
+        "depth_z_median_mm": 955.1644287109375,
+        "depth_z_p10_mm": 950.0635681152344,
+        "depth_z_p90_mm": 960.3269348144531,
+        "distance_3d_median_mm": 960.804443359375,
+        "nearest_surface_mm": null,
+        "visible_extent_xyz_mm": null,
+        "confidence_median": null,
+        "measurement_kind": "coarse"
+      },
+      "postprocess": {
+        "valid": true,
+        "reason": null,
+        "roi_overlap": 1.0,
+        "roi_center_inside": true,
+        "surface_valid_ratio": 0.822361950259941,
+        "surface_raised_ratio": 0.9929947460595446,
+        "surface_height_percentile_mm": 91.43682277638823,
+        "surface_height_max_mm": 210.31739437799592,
+        "surface_height_p99_mm": 91.93439772419583,
+        "surface_height_threshold_mm": 5.0,
+        "surface_status": "PASS",
+        "surface_mask_pixels": 28468,
+        "surface_valid_points": 23411,
+        "surface_raised_points": 23247,
+        "surface_raised_ratio_mask": 0.816601095967402,
+        "duplicate_of_instance_id": null,
+        "duplicate_mask_iou": null,
+        "duplicate_containment": null,
+        "surface_height_mode": "plane",
+        "surface_reference_status": "MATCH"
+      }
+    },
+    {
+      "instance_id": 1,
+      "class_id": 4,
+      "class_name": "hop_anibox",
+      "confidence": 0.4220260679721832,
+      "bbox_xyxy": [
+        199,
+        258,
+        403,
+        443
+      ],
+      "verified_3d": true,
+      "measurement": {
+        "valid": true,
+        "reason": null,
+        "point_count": 17048,
+        "mask_pixel_count": 21809,
+        "valid_ratio": 0.7816956302443945,
+        "center_xyz_mm": [
+          -38.21273422241211,
+          -44.36275100708008,
+          1011.1846923828125
+        ],
+        "depth_z_median_mm": 1011.1846923828125,
+        "depth_z_p10_mm": 1006.9189758300781,
+        "depth_z_p90_mm": 1016.0915893554687,
+        "distance_3d_median_mm": 1013.236572265625,
+        "nearest_surface_mm": null,
+        "visible_extent_xyz_mm": null,
+        "confidence_median": null,
+        "measurement_kind": "coarse"
+      },
+      "postprocess": {
+        "valid": true,
+        "reason": null,
+        "roi_overlap": 1.0,
+        "roi_center_inside": true,
+        "surface_valid_ratio": 0.7049841808427714,
+        "surface_raised_ratio": 1.0,
+        "surface_height_percentile_mm": 59.80455491614712,
+        "surface_height_max_mm": 61.36610035070839,
+        "surface_height_p99_mm": 60.05670300220274,
+        "surface_height_threshold_mm": 5.0,
+        "surface_status": "PASS",
+        "surface_mask_pixels": 21809,
+        "surface_valid_points": 15375,
+        "surface_raised_points": 15375,
+        "surface_raised_ratio_mask": 0.7049841808427714,
+        "duplicate_of_instance_id": null,
+        "duplicate_mask_iou": null,
+        "duplicate_containment": null,
+        "surface_height_mode": "plane",
+        "surface_reference_status": "MATCH"
+      }
+    },
+    {
+      "instance_id": 2,
+      "class_id": 3,
+      "class_name": "khoi_lap_phuong",
+      "confidence": 0.34795674681663513,
+      "bbox_xyxy": [
+        198,
+        258,
+        403,
+        443
+      ],
+      "verified_3d": true,
+      "measurement": {
+        "valid": true,
+        "reason": null,
+        "point_count": 17130,
+        "mask_pixel_count": 21899,
+        "valid_ratio": 0.7822274989725558,
+        "center_xyz_mm": [
+          -38.22089385986328,
+          -44.70819091796875,
+          1011.203125
+        ],
+        "depth_z_median_mm": 1011.203125,
+        "depth_z_p10_mm": 1006.92666015625,
+        "depth_z_p90_mm": 1016.2175354003906,
+        "distance_3d_median_mm": 1013.26953125,
+        "nearest_surface_mm": null,
+        "visible_extent_xyz_mm": null,
+        "confidence_median": null,
+        "measurement_kind": "coarse"
+      },
+      "postprocess": {
+        "valid": true,
+        "reason": null,
+        "roi_overlap": 1.0,
+        "roi_center_inside": true,
+        "surface_valid_ratio": 0.697383442166309,
+        "surface_raised_ratio": 1.0,
+        "surface_height_percentile_mm": 59.8075336478381,
+        "surface_height_max_mm": 61.36610035070839,
+        "surface_height_p99_mm": 60.06033348866786,
+        "surface_height_threshold_mm": 5.0,
+        "surface_status": "PASS",
+        "surface_mask_pixels": 21899,
+        "surface_valid_points": 15272,
+        "surface_raised_points": 15272,
+        "surface_raised_ratio_mask": 0.697383442166309,
+        "duplicate_of_instance_id": null,
+        "duplicate_mask_iou": null,
+        "duplicate_containment": null,
+        "surface_height_mode": "plane",
+        "surface_reference_status": "MATCH"
+      }
+    }
+  ],
+  "rejected": [],
+  "camera_settings": {
+    "source": "config",
+    "values": {
+      "CapturingSettings/LEDPower": 2048,
+      "CapturingSettings/LaserPower": 2048,
+      "CapturingSettings/ShutterMultiplier": 1,
+      "CapturingSettings/TextureSource": "LED"
+    },
+    "read_messages": {},
+    "writes": {
+      "CapturingSettings/TextureSource": "LED",
+      "CapturingSettings/ShutterMultiplier": 1,
+      "CapturingSettings/LaserPower": 2048,
+      "CapturingSettings/LEDPower": 2048
+    },
+    "coordinates": {
+      "verified_by": "device_get_settings",
+      "values": {
+        "CoordinatesSettings/CameraSpace": "PrimaryCamera",
+        "CoordinatesSettings/CoordinateSpace": "CameraSpace"
+      },
+      "set_settings_messages": {
+        "CoordinatesSettings/CameraSpace": "not available"
+      }
+    },
+    "writes_on_open": {}
+  },
+  "acquisition_identity": {
+    "shape_hw": [
+      800,
+      800
+    ],
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "roi_xyxy": [
+      620,
+      280,
+      1420,
+      1080
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "calibration_id": "setup-001",
+    "texture_source": "LED",
+    "led_power": 2048
+  },
+  "reference_identity": {
+    "status": "MATCH",
+    "differences": {},
+    "saved_identity": {
+      "shape_hw": [
+        800,
+        800
+      ],
+      "device_id": "JEJ-043",
+      "coordinate_space": "CameraSpace/PrimaryCamera",
+      "roi_xyxy": [
+        620,
+        280,
+        1420,
+        1080
+      ],
+      "source_shape_hw": [
+        1544,
+        2064
+      ],
+      "calibration_id": "setup-001",
+      "texture_source": "LED",
+      "led_power": 2048
+    },
+    "frame_identity": {
+      "shape_hw": [
+        800,
+        800
+      ],
+      "device_id": "JEJ-043",
+      "coordinate_space": "CameraSpace/PrimaryCamera",
+      "roi_xyxy": [
+        620,
+        280,
+        1420,
+        1080
+      ],
+      "source_shape_hw": [
+        1544,
+        2064
+      ],
+      "calibration_id": "setup-001",
+      "texture_source": "LED",
+      "led_power": 2048
+    },
+    "reference_path": "/home/noridomi-05/phoxi-single-target/data/calibration/bin_surface.npz",
+    "run_live_capture_settings": {
+      "texture_source": "LED",
+      "led_power": 1048
+    }
+  },
+  "robot_ready": false
+}

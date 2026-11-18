@@ -1,0 +1,102 @@
+{
+  "id": "C0015",
+  "role": "fit",
+  "enabled": true,
+  "captured_at_utc": "2026-11-02T10:11:13.505338+00:00",
+  "confirmed_at_utc": "2026-11-02T10:11:56.189634+00:00",
+  "frame_id": 25,
+  "robot_pose_xyzabc": [
+    -345.46,
+    146.23,
+    250.86,
+    10.37,
+    -167.82,
+    24.83
+  ],
+  "T_base_flange": [
+    [
+      -0.9482264142340804,
+      0.24040571893831708,
+      -0.2075373644684952,
+      -345.46
+    ],
+    [
+      0.2533814403678724,
+      0.9666206719308605,
+      -0.03797791822933647,
+      146.23
+    ],
+    [
+      0.19147979795759246,
+      -0.08859778156185827,
+      -0.9774896010068019,
+      250.86
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "T_camera_board": [
+    [
+      -0.1971353208665372,
+      -0.9627344128248517,
+      0.18514890123799171,
+      -39.58218639240114
+    ],
+    [
+      0.9418410479488062,
+      -0.2384068980631634,
+      -0.236849300937528,
+      -251.9730995886351
+    ],
+    [
+      0.2721637478900201,
+      0.12768947223122518,
+      0.953741208617815,
+      928.0001277404872
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  ],
+  "rms_mm": 0.7535418449912294,
+  "max_error_mm": 1.1494129146498868,
+  "measured_square_mm": 20.27294301189808,
+  "valid_corners": 46,
+  "inlier_corners": 40,
+  "total_corners": 63,
+  "origin_flipped_180": false,
+  "method": "organized_xyz_local_affine_then_rigid_3d",
+  "stationary_confirmed": true,
+  "origin_confirmed": true,
+  "camera_identity": {
+    "device_id": "JEJ-043",
+    "coordinate_space": "CameraSpace/PrimaryCamera",
+    "image_shape_hw": [
+      1544,
+      2064
+    ],
+    "source_shape_hw": [
+      1544,
+      2064
+    ],
+    "roi_xyxy": null,
+    "calibration_id": "setup-001"
+  },
+  "board": {
+    "type": "checkerboard",
+    "counts": "inner_corners",
+    "cols": 7,
+    "rows": 9,
+    "square_mm": 20.0,
+    "origin": "physically_marked_first_inner_corner",
+    "axes": "x=columns,y=rows,z=x_cross_y"
+  },
+  "demo": false
+}
